@@ -1,0 +1,21 @@
+
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{block name="title"}模板继承-基础模板{/block}</title>
+        <details>待定</details>
+        <link rel="stylesheet" href="/static/jquery-ui-1.13.2/jquery-ui.min.css">
+        <link rel="stylesheet" href="/static/style.css">
+        <script type="text/javascript" src="/jquery-3.6.1.js"></script>
+        <script src="/static/jquery-ui-1.13.2/jquery-ui.min.js"></script>
+    </head>
+    <body>
+        <div>
+            {block name="header"}头部区域{/block}
+            {block name="menu"}菜单区域{/block}
+            {block name="main"}主内容{/block}
+            {block name="footer"}底部区域{/block}
+        </div>
+    </body>
+</html>
