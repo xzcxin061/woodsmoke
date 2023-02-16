@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2023-02-14 16:17:34
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-02-15 17:32:23
+ * @LastEditTime: 2023-02-16 16:25:45
  * @FilePath: /woodsmoke/app/model/Article.php
  * @Description: 
  * 
@@ -20,14 +20,33 @@ class Article extends Model
     protected $connection = "mysql";
 
     /**
-     * 获取链接列表
+     * @Refer 获取器，数据表字段article_url
      * @Author WoodSmoke
-     * @param $value 输入的查询数据
-     * @param $data 原始数据，系统实现获取
+     * @Param $value article表主键id对应的article_url字段数据.系统实现(不用考虑怎么实现的)
+     * @Param $data 原始数据,article表主键id对应的一条完整数据，系统实现(不用考虑怎么实现的).原始数据不会被改变.
+     * @Func 必须是public,测试protected也没影响
+     * @Note 避坑：如果数据表字段带下划线，定义获取器时，下划线要进行驼峰转换。
      */
-    public function getArticle_urlAttr($value, $data)
+    protected function getArticleUrlAttr($value, $data)
     {
-        // 其实这里可以不用做任何处理，除非你想改变输出数据
+        // 其实这里可以不用做任何处理，模型的实例化对象就可以输出原始数据,除非你想改变输出数据,并且在应用中主动触发获取器.
+        $url = $value."11111.html";
+        // return $url;
+        $arr = array_merge($data, ['change_url' => $url]); // 构造新的数据,你可以随心所欲
+        return $arr; // 这里返回什么,获取器($model->article_url)获取的就是什么
     }
 
+    /**
+     * @Refer 获取器，不存在的数据表字段
+     * @Author Woodsmoke
+     * @Param $value, $data
+     * @Func 必须是public,测试protected也没影响
+     */
+    protected function getTitleLengthAttr($value, $data)
+    {
+        $title = $data['title'];
+        $length = mb_strlen($title, 'UTF-8');
+        
+        return $length;
+    }
 }
