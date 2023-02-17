@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-02-16 16:33:21
+ * @LastEditTime: 2023-02-17 11:00:57
  * @FilePath: /woodsmoke/app/controller/Mydoc.php
  * @Description: 
  * 
@@ -53,8 +53,12 @@ class Mydoc
         // var_dump($art->getAttr('article_url'));echo "<br/>";echo "<br/>";
 
         // 获取器定义数据表不存在的字段
-        // $title = $art->append(['title_length']);
         $title_length = $art->title_length;
-        // var_dump($art);
+        // var_dump($art); // 返回3个带数据的属性，data,origin,get,其中只有get属性包含触发获取器添加的数据表没有的字段
+        // 模型的序列化输出,append(['title_length'])(貌似优先)，也可以在模型里设置$append=['title_length'],二选一
+        // toArray()不用append，就不会包括数据表没有的字段。
+        $arr = $art->append(['title_length'])->toArray();
+        // var_dump($arr);
+        
     }
 }
