@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-02-17 11:00:57
+ * @LastEditTime: 2023-02-21 18:25:30
  * @FilePath: /woodsmoke/app/controller/Mydoc.php
  * @Description: 
  * 
@@ -48,7 +48,11 @@ class Mydoc
         $fabutime = $art->fabutime?:'';
         // var_dump($url);echo "<br/>";echo "<br/>";
         // 通过getData获取原始数据，这里不能用$article【因为它是模型初始化的对象(模型实例)，里边没有数据，不理解看官方文档依赖注入】， 要用$art
-        // var_dump($art->getData('article_url'));echo "<br/>";echo "<br/>";
+        echo "【getData】";var_dump($art->getData('article_url'));echo "<br/>";echo "<br/>";
+        // 获取原始数据建议用getOrigin代替使用getData，参考ThinkORM。字段类型和时间字段的自动处理不再纳入获取器范畴，使用getData获取时间字段的原始值，需要关闭自动时间字段处理功能，设置autoWriteTimestamp属性为false。希望时间字段自动写入处理，但不希望进行自动格式化输出，可以设置dateFormat属性为false。
+        // 在数据库配置文件中设置的话,自动写入时间戳：'auto_timestamp' = true,时间字段取出后默认时间格式：'datatime_format' = false.
+        echo "【getOrigin】";var_dump($art->getOrigin('article_url'));echo "<br/>";echo "<br/>";
+        
         // 显示的调用getAttr方法自动出发获取器getArticleUrlAttr
         // var_dump($art->getAttr('article_url'));echo "<br/>";echo "<br/>";
 
