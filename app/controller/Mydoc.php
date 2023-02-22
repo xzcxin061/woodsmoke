@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-02-21 18:25:30
+ * @LastEditTime: 2023-02-22 19:00:01
  * @FilePath: /woodsmoke/app/controller/Mydoc.php
  * @Description: 
  * 
@@ -14,6 +14,7 @@ namespace app\controller;
 
 // use app\controller\Copy;
 use app\model\Article;
+use think\facade\Db;
 
 class Mydoc
 {
@@ -48,10 +49,10 @@ class Mydoc
         $fabutime = $art->fabutime?:'';
         // var_dump($url);echo "<br/>";echo "<br/>";
         // 通过getData获取原始数据，这里不能用$article【因为它是模型初始化的对象(模型实例)，里边没有数据，不理解看官方文档依赖注入】， 要用$art
-        echo "【getData】";var_dump($art->getData('article_url'));echo "<br/>";echo "<br/>";
+        // echo "【getData】";var_dump($art->getData('article_url'));echo "<br/>";echo "<br/>";
         // 获取原始数据建议用getOrigin代替使用getData，参考ThinkORM。字段类型和时间字段的自动处理不再纳入获取器范畴，使用getData获取时间字段的原始值，需要关闭自动时间字段处理功能，设置autoWriteTimestamp属性为false。希望时间字段自动写入处理，但不希望进行自动格式化输出，可以设置dateFormat属性为false。
         // 在数据库配置文件中设置的话,自动写入时间戳：'auto_timestamp' = true,时间字段取出后默认时间格式：'datatime_format' = false.
-        echo "【getOrigin】";var_dump($art->getOrigin('article_url'));echo "<br/>";echo "<br/>";
+        // echo "【getOrigin】";var_dump($art->getOrigin('article_url'));echo "<br/>";echo "<br/>";
         
         // 显示的调用getAttr方法自动出发获取器getArticleUrlAttr
         // var_dump($art->getAttr('article_url'));echo "<br/>";echo "<br/>";
@@ -63,6 +64,26 @@ class Mydoc
         // toArray()不用append，就不会包括数据表没有的字段。
         $arr = $art->append(['title_length'])->toArray();
         // var_dump($arr);
-        
+
+        // 实测模型查询find()/select()一定要放在动态获取器withAttr()前边，否则不走动态获取器。Db查询必须写后边。
+        // 官方文档：如果同时还在模型里面定义了相同字段的获取器，则动态获取器优先，经测试是的。
+        // withAttr方法支持多次调用，定义多个字段的获取器。
+        $array = $article->limit(3)->select()->withAttr('article_url', function($value, $data){
+            return $value;
+        })->withAttr('id', function($value, $data){
+            return $value."~~~~";
+        });
+        // 不通过获取器也能获取，获取器是为了特殊处理
+        foreach($array as $key=>$val){
+            var_dump($array[$key]->article_url.$key);echo "<br/>";echo "<br/>";
+            var_dump($array[$key]->id.$key);echo "<br/>";echo "<br/>";
+        }
+        // 另外注意，withAttr方法之后不能再使用模型的查询方法，必须使用Db类的查询方法。这种方式官方文档举的例子用模型查询坑人。
+        // 实测代码，注意，返回的是数组，不是对象了。
+        $array1 = Db::table('article')->withAttr('article_url', function($value, $data){
+            return $value."----";
+        })->find(280);
+        // var_dump($array1);
+        var_dump($array1['article_url']);
     }
 }
