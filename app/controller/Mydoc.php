@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-02-22 19:00:01
+ * @LastEditTime: 2023-02-22 19:05:02
  * @FilePath: /woodsmoke/app/controller/Mydoc.php
  * @Description: 
  * 
@@ -65,7 +65,7 @@ class Mydoc
         $arr = $art->append(['title_length'])->toArray();
         // var_dump($arr);
 
-        // 实测模型查询find()/select()一定要放在动态获取器withAttr()前边，否则不走动态获取器。Db查询必须写后边。
+        // 实测模型查询find()/select()一定要放在动态获取器withAttr()前边，否则不走动态获取器。Db查询find()/select()必须写withAttr()后边。
         // 官方文档：如果同时还在模型里面定义了相同字段的获取器，则动态获取器优先，经测试是的。
         // withAttr方法支持多次调用，定义多个字段的获取器。
         $array = $article->limit(3)->select()->withAttr('article_url', function($value, $data){
