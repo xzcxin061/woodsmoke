@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-02-22 19:05:02
+ * @LastEditTime: 2023-02-23 10:22:07
  * @FilePath: /woodsmoke/app/controller/Mydoc.php
  * @Description: 
  * 
@@ -65,25 +65,45 @@ class Mydoc
         $arr = $art->append(['title_length'])->toArray();
         // var_dump($arr);
 
-        // 实测模型查询find()/select()一定要放在动态获取器withAttr()前边，否则不走动态获取器。Db查询find()/select()必须写withAttr()后边。
-        // 官方文档：如果同时还在模型里面定义了相同字段的获取器，则动态获取器优先，经测试是的。
-        // withAttr方法支持多次调用，定义多个字段的获取器。
+        /**
+         * 实测模型查询find()/select()一定要放在动态获取器withAttr()前边。Db查询find()/select()必须写在动态获取器withAttr()后边。
+         * 官方文档：如果同时还在模型里面定义了相同字段的获取器，则动态获取器优先，经测试是的。
+         * withAttr方法支持多次调用，定义多个字段的获取器。
+         * $array返回的是一个对象
+         */
         $array = $article->limit(3)->select()->withAttr('article_url', function($value, $data){
             return $value;
         })->withAttr('id', function($value, $data){
             return $value."~~~~";
         });
-        // 不通过获取器也能获取，获取器是为了特殊处理
+        // // 不通过获取器也能获取，获取器是为了特殊处理
         foreach($array as $key=>$val){
-            var_dump($array[$key]->article_url.$key);echo "<br/>";echo "<br/>";
-            var_dump($array[$key]->id.$key);echo "<br/>";echo "<br/>";
+            var_dump($val->article_url.$key);echo "<br/>";echo "<br/>";
+            var_dump($val->id.$key);echo "<br/>";echo "<br/>";
         }
-        // 另外注意，withAttr方法之后不能再使用模型的查询方法，必须使用Db类的查询方法。这种方式官方文档举的例子用模型查询坑人。
-        // 实测代码，注意，返回的是数组，不是对象了。
+        var_dump($array);
+
+        /**
+         * 下面这种方式不会报错，但是实际上没有经过动态获取器处理，是一个普通的模型查询
+         * 注意$array返回数据和上边不一样
+         */
+        $array = $article->withAttr('article_url', function($value, $data){
+            return $value;
+        })->withAttr('id', function($value, $data){
+            return $value."~~~~";
+        })->limit(3)->select();
+        // // 不通过获取器也能获取，获取器是为了特殊处理
+        // var_dump($array);
+
+        /**
+         * 另外注意，withAttr方法之后不能再使用模型的查询方法，必须使用Db类的查询方法。这种方式官方文档举的例子用模型查询坑人。
+         * 实测代码，注意，返回的是数组，不是对象了。
+         */
         $array1 = Db::table('article')->withAttr('article_url', function($value, $data){
             return $value."----";
         })->find(280);
-        // var_dump($array1);
-        var_dump($array1['article_url']);
+        // // var_dump($array1);
+        // var_dump($array1['article_url']);
+
     }
 }
