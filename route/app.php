@@ -212,6 +212,6 @@ Route::rule('response/param', 'Copy/resparam', 'get');
 Route::rule('getuser/:id', 'Copy/getUser', 'get');
 // 测试获取器 2023-2-14
 Route::rule('art/:id', 'Mydoc/getArticle', 'get');
-
-
+// 测试修改器
+Route::rule('artup/:id', 'Mydoc/setArticle', 'get');
 

@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-02-23 10:22:07
+ * @LastEditTime: 2023-03-01 15:22:34
  * @FilePath: /woodsmoke/app/controller/Mydoc.php
  * @Description: 
  * 
@@ -76,12 +76,12 @@ class Mydoc
         })->withAttr('id', function($value, $data){
             return $value."~~~~";
         });
-        // // 不通过获取器也能获取，获取器是为了特殊处理
+        // 不通过获取器也能获取，获取器是为了特殊处理
         foreach($array as $key=>$val){
             var_dump($val->article_url.$key);echo "<br/>";echo "<br/>";
             var_dump($val->id.$key);echo "<br/>";echo "<br/>";
         }
-        var_dump($array);
+        // var_dump($array);
 
         /**
          * 下面这种方式不会报错，但是实际上没有经过动态获取器处理，是一个普通的模型查询
@@ -96,14 +96,32 @@ class Mydoc
         // var_dump($array);
 
         /**
-         * 另外注意，withAttr方法之后不能再使用模型的查询方法，必须使用Db类的查询方法。这种方式官方文档举的例子用模型查询坑人。
-         * 实测代码，注意，返回的是数组，不是对象了。
+         * 另外注意，withAttr方法之后不能再使用模型的查询方法，必须使用Db类的查询方法。
+         * 实测代码，注意，Db查询返回的是数组，不是对象了。
+         * 该注释存疑：这种方式官方文档举的例子用模型查询坑人。
          */
         $array1 = Db::table('article')->withAttr('article_url', function($value, $data){
             return $value."----";
         })->find(280);
         // // var_dump($array1);
         // var_dump($array1['article_url']);
+    }
 
+    /**
+     * @Author Woodsmoke
+     * @Description 测试修改器
+     */
+    public function setArticle(Article $article0) 
+    {
+        // 写法1：静态查询方法
+        // $article = Article::find(260); //原始 uid=2
+        // $article->uid = $article->uid; // 赋值操作左边触发修改器
+        // $article->save(); // 更新数据，入库
+
+        // 写法2：依赖注入方法
+        $data = $article0->find(260);
+        $data->uid = 1;
+        $data->save(); // 不要用$article0【初始化模型】调save()，和data【模型数据对象】有区别
+        var_dump($data->uid);
     }
 }

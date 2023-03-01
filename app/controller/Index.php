@@ -227,7 +227,7 @@ class Index extends BaseController
     }
 
     /**
-     * 
+     * 随便测试一下调用百度地图
      */
     public function maps()
     {
@@ -239,6 +239,6 @@ class Index extends BaseController
         $request = "Get";
         $getRegion = "https://api.map.baidu.com/place/v2/search?query=ATM机&tag=银行&region=北京&output=json&ak=qjZIqKemNWV2jL1Uqu5W2oOSmKjLzhMs"; //GET请求
 
-        http://lbsyun.baidu.com/apiconsole/qjZIqKemNWV2jL1Uqu5W2oOSmKjLzhMs
+        // http://lbsyun.baidu.com/apiconsole/qjZIqKemNWV2jL1Uqu5W2oOSmKjLzhMs
     }
 }
