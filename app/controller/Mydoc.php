@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-03-02 17:15:53
+ * @LastEditTime: 2023-03-02 17:26:12
  * @FilePath: /woodsmoke/app/controller/Mydoc.php
  * @Description: 
  * 
@@ -151,7 +151,7 @@ class Mydoc
         $data4 = $article0->find(260);
         $data4_array = $data4->toArray(); // 触发获取器
         $data4->setAttrs($data4_array); // 触发修改器，这里要使用一维数组，setAttrs循环里还是调用setAttr
-        var_dump($data4);
+        var_dump($data4->uid);
 
     }
 }
