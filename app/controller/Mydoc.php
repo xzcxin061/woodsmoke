@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-03-02 17:12:48
+ * @LastEditTime: 2023-03-02 17:15:53
  * @FilePath: /woodsmoke/app/controller/Mydoc.php
  * @Description: 
  * 
@@ -110,6 +110,7 @@ class Mydoc
     /**
      * @Author Woodsmoke
      * @Description 测试修改器
+     * @func 触发setUidAttr修改器
      */
     public function setArticle(Article $article0) 
     {
