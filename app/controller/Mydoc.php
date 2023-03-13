@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-03-02 19:32:54
+ * @LastEditTime: 2023-03-03 15:49:41
  * @FilePath: /woodsmoke/app/controller/Mydoc.php
  * @Description: 
  * 
@@ -153,5 +153,16 @@ class Mydoc
         $data4->setAttrs($data4_array); // 触发修改器，这里建议使用一维数组(name必须是字符串，一般对应表字段)，setAttrs循环里还是调用setAttr
         var_dump($data4->uid);
 
+    }
+
+
+    /**
+     * @Title 搜索器测试
+     * @Author woodsmoke
+     * @Time 2023-3-3
+     */
+    public function searchArticle()
+    {
+        
     }
 }

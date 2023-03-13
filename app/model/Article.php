@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2023-02-14 16:17:34
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-03-01 14:08:40
+ * @LastEditTime: 2023-03-03 16:03:37
  * @FilePath: /woodsmoke/app/model/Article.php
  * @Description: 
  * 
@@ -51,9 +51,23 @@ class Article extends Model
         return $length;
     }
 
-
+    /**
+     * 修改器
+     * @Author woodsmoke
+     * @Time 2023-3-3
+     */
     protected function setUidAttr($value, $data)
     {
         return strval($value + 1);
+    }
+
+    /**
+     * 搜索器
+     * @Author woodsmoke
+     * @Time 2023-3-3
+     */
+    protected function searchUidAttr($query, $value, $data)
+    {
+        
     }
 }
