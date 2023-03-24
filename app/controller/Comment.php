@@ -3,7 +3,7 @@
  * @Author: chuiyan xzcxin061@163.com
  * @Date: 2023-03-13 14:33:10
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-03-24 18:55:13
+ * @LastEditTime: 2023-03-24 19:02:09
  * @FilePath: /woodsmoke/app/controller/Comment.php
  * @Description: 
  * 
@@ -20,6 +20,7 @@ class Comment{
      */
     public function MakeDict(){
         /**
+         * 插件Demo
          * 源码开始：
          * header('Content-Type: text/html; charset=utf-8');
          * require_once('phpanalysis.class.php');
