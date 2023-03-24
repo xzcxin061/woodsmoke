@@ -215,3 +215,5 @@ Route::rule('art/:id', 'Mydoc/getArticle', 'get');
 // 测试修改器
 Route::rule('artup/:id', 'Mydoc/setArticle', 'get');
 
+Route::rule('cm', 'Comment/MakeDict', 'get');
+
