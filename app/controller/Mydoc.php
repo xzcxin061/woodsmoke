@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-03-03 15:49:41
+ * @LastEditTime: 2023-03-28 15:23:16
  * @FilePath: /woodsmoke/app/controller/Mydoc.php
  * @Description: 
  * 
@@ -15,6 +15,7 @@ namespace app\controller;
 // use app\controller\Copy;
 use app\model\Article;
 use think\facade\Db;
+use think\facade\Request;
 
 class Mydoc
 {
@@ -157,12 +158,19 @@ class Mydoc
 
 
     /**
-     * @Title 搜索器测试
+     * @Title 搜索器测试场景：表单提交。没有深入测试，官方文档内容也有限。
+     * @说明：withSearch添加的搜索器字段，在模型中可以不添加字段Attr方法，除非想做特别处理。查询数组中有选择的添加搜索器字段（withSearch参数2）,并且只支持查询withSearch搜索器字段（withSearch参数1）。
      * @Author woodsmoke
      * @Time 2023-3-3
      */
     public function searchArticle()
     {
-        
+        $data = Article::withSearch(['title', 'uid', 'num'], [
+            'title' => Request::post('title'),
+            'uid'   => Request::post('uid'),
+            'num'   => '1阅读'
+        ])->select();
+        echo Article::getLastSql();
+        var_dump($data);
     }
 }

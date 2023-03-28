@@ -214,6 +214,8 @@ Route::rule('getuser/:id', 'Copy/getUser', 'get');
 Route::rule('art/:id', 'Mydoc/getArticle', 'get');
 // 测试修改器
 Route::rule('artup/:id', 'Mydoc/setArticle', 'get');
+// 测试搜索器
+Route::post('artup/:id', 'Mydoc/searchArticle');
 
 Route::rule('cm', 'Comment/MakeDict', 'get');
 

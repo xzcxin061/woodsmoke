@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2023-02-14 16:17:34
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-03-03 16:03:37
+ * @LastEditTime: 2023-03-28 14:59:27
  * @FilePath: /woodsmoke/app/model/Article.php
  * @Description: 
  * 
@@ -62,12 +62,25 @@ class Article extends Model
     }
 
     /**
-     * 搜索器
+     * 搜索器uid
+     * 限制和规范表单的搜索条件；
+     * 预定义查询条件简化查询；（一般不是指MySQL，您可以使用MySQL中的过程（或可能是函数）来完成此操作：http://dev.mysql.com/doc/refman/5.1/en/create-procedure.html或http://dev.mysql.com/doc/refman/5.1/en/stored-routines.html）
      * @Author woodsmoke
      * @Time 2023-3-3
      */
-    protected function searchUidAttr($query, $value, $data)
+    public function searchTitleAttr($query, $value, $data)
     {
-        
+        $query->where('title','like', $value.'%');
+    }
+
+    /**
+     * 搜索器article_url
+     * 定义多个搜索器一起使用
+     * @Author woodsmoke
+     * @Time 2023-3-3
+     */
+    public function searchUidAttr($query, $value, $data)
+    {
+        $query->where('uid','=', $value);
     }
 }
