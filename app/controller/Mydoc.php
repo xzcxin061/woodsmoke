@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-03-28 15:23:16
+ * @LastEditTime: 2023-03-28 15:50:49
  * @FilePath: /woodsmoke/app/controller/Mydoc.php
  * @Description: 
  * 
@@ -158,7 +158,7 @@ class Mydoc
 
 
     /**
-     * @Title 搜索器测试场景：表单提交。没有深入测试，官方文档内容也有限。
+     * @Title 搜索器测试场景：表单提交。没有深入测试，官方文档内容也有限。本函数post提交来自Copy/getUser对应的模板。
      * @说明：withSearch添加的搜索器字段，在模型中可以不添加字段Attr方法，除非想做特别处理。查询数组中有选择的添加搜索器字段（withSearch参数2）,并且只支持查询withSearch搜索器字段（withSearch参数1）。
      * @Author woodsmoke
      * @Time 2023-3-3
