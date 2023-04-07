@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-03-28 15:50:49
+ * @LastEditTime: 2023-04-07 11:52:30
  * @FilePath: /woodsmoke/app/controller/Mydoc.php
  * @Description: 
  * 
@@ -16,9 +16,18 @@ namespace app\controller;
 use app\model\Article;
 use think\facade\Db;
 use think\facade\Request;
+// use app\controller\SayHelloWorld;
 
-class Mydoc
+class Mydoc extends SayHelloWorld
 {
+    // 多个Trait类的冲突控制
+    use \app\extend\SayHello, \app\extend\SayHello2 {
+        // 解决方式一：insteadof关键字
+        \app\extend\SayHello::SayHello insteadOf \app\extend\SayHello2;
+        // 解决方式二:as关键字
+        \app\extend\SayHello2::SayHello as SayHello2;
+    }
+
     public function firstapp()
     {
         $a = invoke('app\controller\Copy');
@@ -160,6 +169,7 @@ class Mydoc
     /**
      * @Title 搜索器测试场景：表单提交。没有深入测试，官方文档内容也有限。本函数post提交来自Copy/getUser对应的模板。
      * @说明：withSearch添加的搜索器字段，在模型中可以不添加字段Attr方法，除非想做特别处理。查询数组中有选择的添加搜索器字段（withSearch参数2）,并且只支持查询withSearch搜索器字段（withSearch参数1）。
+     * 经测试：搜索器(在模型里定义)必须是public声明的
      * @Author woodsmoke
      * @Time 2023-3-3
      */
@@ -170,7 +180,19 @@ class Mydoc
             'uid'   => Request::post('uid'),
             'num'   => '1阅读'
         ])->select();
-        echo Article::getLastSql();
-        var_dump($data);
+        echo Article::getLastSql();echo "<br/>";
+        var_dump($data->isEmpty());
+    }
+
+    /**
+     * @Func 软删除
+     * @Author WoodSmoke
+     * @Time 2023/3/31 
+     */
+    public function softD()
+    {
+        // 先测试一下trait
+        $this->SayHello();
+        $this->SayHello2();
     }
 }

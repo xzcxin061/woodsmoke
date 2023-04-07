@@ -219,3 +219,6 @@ Route::post('artup/:id', 'Mydoc/searchArticle');
 
 Route::rule('cm', 'Comment/MakeDict', 'get');
 
+Route::rule('softd', 'Mydoc/softD', 'get');
+
+

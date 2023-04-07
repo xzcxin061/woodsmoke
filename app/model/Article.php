@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2023-02-14 16:17:34
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-03-28 14:59:27
+ * @LastEditTime: 2023-03-31 10:48:56
  * @FilePath: /woodsmoke/app/model/Article.php
  * @Description: 
  * 
@@ -13,9 +13,11 @@ namespace app\model;
 
 use think\Model;
 use think\facade\Db;
+use think\model\concern\SoftDelete;
 
 class Article extends Model
 {
+    use SoftDelete;
     // 设置连接2
     protected $connection = "mysql";
     // protected $append = ['title_length'];
