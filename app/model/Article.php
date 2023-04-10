@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2023-02-14 16:17:34
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-03-31 10:48:56
+ * @LastEditTime: 2023-04-10 15:55:11
  * @FilePath: /woodsmoke/app/model/Article.php
  * @Description: 
  * 
@@ -13,15 +13,18 @@ namespace app\model;
 
 use think\Model;
 use think\facade\Db;
-use think\model\concern\SoftDelete;
+use think\model\concern\SoftDelete; // 类外部导入命名空间
 
 class Article extends Model
 {
-    use SoftDelete;
+    // 设置软删除字段
+    use SoftDelete; // 类内部 use trait
+    protected $deleteTime = 'delete_time';
+    protected $defaultSoftDelete = 0;
     // 设置连接2
     protected $connection = "mysql";
     // protected $append = ['title_length'];
-
+    
     /**
      * @Refer 获取器，数据表字段article_url
      * @Author WoodSmoke

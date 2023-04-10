@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-04-07 11:52:30
+ * @LastEditTime: 2023-04-10 17:20:02
  * @FilePath: /woodsmoke/app/controller/Mydoc.php
  * @Description: 
  * 
@@ -193,6 +193,19 @@ class Mydoc extends SayHelloWorld
     {
         // 先测试一下trait
         $this->SayHello();
+        echo "<br/>";
         $this->SayHello2();
+        echo "<br/>";
+        // 测试软删除数据
+        Article::destroy(1);
+        var_dump(Article::find(1));
+        echo "<br/>";
+        $article = Article::onlyTrashed()->find(1);
+        var_dump(Article::onlyTrashed()->find(1));
+        echo "<br/>";
+        // var_dump(Article::withTrashed()->find(1));
+        echo "<br/>";
+        var_dump(Article::getOptions()); // 获取Options数据，主要检查soft_delete标识(强制删除才会去除soft_delete标识)
+        $article->restore();
     }
 }
