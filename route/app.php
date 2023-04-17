@@ -221,4 +221,7 @@ Route::rule('cm', 'Comment/MakeDict', 'get');
 
 Route::rule('softd', 'Mydoc/softD', 'get');
 
+Route::rule('otore', 'Mydoc/oneToOneRelation', 'get');
+
+
 

@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-04-10 17:21:48
+ * @LastEditTime: 2023-04-17 12:07:44
  * @FilePath: /woodsmoke/app/controller/Mydoc.php
  * @Description: 
  * 
@@ -17,6 +17,7 @@ use app\model\Article;
 use think\facade\Db;
 use think\facade\Request;
 // use app\controller\SayHelloWorld;
+use app\model\User;
 
 class Mydoc extends SayHelloWorld
 {
@@ -207,5 +208,20 @@ class Mydoc extends SayHelloWorld
         echo "<br/>";
         var_dump(Article::getOptions()); // 获取Options数据，主要检查soft_delete标识(强制删除才会去除soft_delete标识)
         $article->restore();
+    }
+
+    /**
+     * @Func 模型关联
+     * @Author WoodSmoke
+     * @Time 2023/4/11
+     * @return NULL
+     */
+    public function oneToOneRelation()
+    {
+        // $user = User::find(2);
+        // var_dump($user->article);echo "<br/>";
+        $article = Article::find(260);
+        var_dump($article->user);echo "<br/>";
+        echo $article->getLastSql();
     }
 }

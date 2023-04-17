@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2023-02-14 16:17:34
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-04-10 15:55:11
+ * @LastEditTime: 2023-04-17 12:12:03
  * @FilePath: /woodsmoke/app/model/Article.php
  * @Description: 
  * 
@@ -14,6 +14,7 @@ namespace app\model;
 use think\Model;
 use think\facade\Db;
 use think\model\concern\SoftDelete; // 类外部导入命名空间
+// use app\model\User;
 
 class Article extends Model
 {
@@ -87,5 +88,13 @@ class Article extends Model
     public function searchUidAttr($query, $value, $data)
     {
         $query->where('uid','=', $value);
+    }
+
+    public function user()
+    {
+        // 关联模型（必须）：关联模型类名
+        // 外键：默认的外键规则是当前模型名（不含命名空间，下同）+_id ，例如user_id
+        // 主键：当前模型主键，默认会自动获取也可以指定传入
+        return $this->hasOne(User::class, 'id', 'user_id'); // 这里官方文档没有说明取谁的外键，测试主键取主表article的外键user_id，外键取子表user的主键id，这是由数据表结构决定的，虽然不建议用反转主表和子表的写法。
     }
 }

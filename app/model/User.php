@@ -2,8 +2,8 @@
 /*
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-06-30 11:58:45
- * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @LastEditTime: 2023-02-09 10:53:24
+ * @LastEditors: chuiyan xzcxin061@163.com
+ * @LastEditTime: 2023-04-17 12:06:31
  * @FilePath: /woodsmoke/app/model/User.php
  * @Description: 
  * 
@@ -44,5 +44,20 @@ class User extends Model
         打印来自模型内部【var_dump(Empty($list)); 】：<br/>
         EOF;
         var_dump(Empty($list));
+    }
+
+    /**
+     * 
+     */
+    public function article()
+    {
+        // 关联模型（必须）：关联模型类名
+        // 外键：关联模型外键，默认的外键名规则是当前模型名+_id
+        // 主键：当前模型主键，一般会自动获取也可以指定传入
+        // return $this->hasMany(Article::class, 'user_id', 'id'); // Article和User在同级目录，不需要使用use
+        // 关联模型（必须）：关联模型类名
+        // 外键：默认的外键规则是当前模型名（不含命名空间，下同）+_id ，例如user_id
+        // 主键：当前模型主键，默认会自动获取也可以指定传入
+        return $this->hasOne(Article::class, 'user_id', 'id'); // 这里官方文档没有说明取谁的外键和主键，外键取子表article的外键user_id，主键取主表user的主键id
     }
 }
