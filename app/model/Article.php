@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2023-02-14 16:17:34
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-04-17 12:12:03
+ * @LastEditTime: 2023-04-19 14:08:03
  * @FilePath: /woodsmoke/app/model/Article.php
  * @Description: 
  * 
@@ -62,7 +62,7 @@ class Article extends Model
      * @Author woodsmoke
      * @Time 2023-3-3
      */
-    protected function setUidAttr($value, $data)
+    protected function setUserIdAttr($value, $data)
     {
         return strval($value + 1);
     }
@@ -85,16 +85,16 @@ class Article extends Model
      * @Author woodsmoke
      * @Time 2023-3-3
      */
-    public function searchUidAttr($query, $value, $data)
+    public function searchUserIdAttr($query, $value, $data)
     {
-        $query->where('uid','=', $value);
+        $query->where('user_id','=', $value);
     }
 
-    public function user()
-    {
-        // 关联模型（必须）：关联模型类名
-        // 外键：默认的外键规则是当前模型名（不含命名空间，下同）+_id ，例如user_id
-        // 主键：当前模型主键，默认会自动获取也可以指定传入
-        return $this->hasOne(User::class, 'id', 'user_id'); // 这里官方文档没有说明取谁的外键，测试主键取主表article的外键user_id，外键取子表user的主键id，这是由数据表结构决定的，虽然不建议用反转主表和子表的写法。
-    }
+    // public function user()
+    // {
+    //     // 关联模型（必须）：关联模型类名
+    //     // 外键：默认的外键规则是当前模型名（不含命名空间，下同）+_id ，例如user_id
+    //     // 主键：当前模型主键，默认会自动获取也可以指定传入
+    //     return $this->hasOne(User::class, 'id', 'user_id'); // 这里官方文档没有说明取谁的外键，测试主键取主表article的外键user_id，外键取子表user的主键id，这是由数据表结构决定的，所以不建议用反转主表和子表的写法。
+    // }
 }

@@ -223,5 +223,5 @@ Route::rule('softd', 'Mydoc/softD', 'get');
 
 Route::rule('otore', 'Mydoc/oneToOneRelation', 'get');
 
-
+Route::rule('otmre', 'Mydoc/oneToManyRelation', 'get');
 

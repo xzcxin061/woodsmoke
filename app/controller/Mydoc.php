@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-04-17 12:07:44
+ * @LastEditTime: 2023-04-24 16:26:39
  * @FilePath: /woodsmoke/app/controller/Mydoc.php
  * @Description: 
  * 
@@ -121,48 +121,48 @@ class Mydoc extends SayHelloWorld
     /**
      * @Author Woodsmoke
      * @Description 测试修改器
-     * @func 触发setUidAttr修改器
+     * @func 触发setuserIdAttr修改器
      */
     public function setArticle(Article $article0) 
     {
         // 写法1：静态查询方法
-        // $article = Article::find(260); //原始 uid=2
-        // $article->uid = $article->uid; // 赋值操作左边触发修改器
+        // $article = Article::find(260); //原始 user_id=2
+        // $article->user_id = $article->user_id; // 赋值操作左边触发修改器
         // $article->save(); // 更新数据，入库
 
         // 写法2：依赖注入方法
         // $data = $article0->find(260);
-        // $data->uid = 1; // 模型对象赋值,触发修改器
+        // $data->user_id = 1; // 模型对象赋值,触发修改器
         // $data->save(); // 不要用$article0【初始化模型，空数据】调save()，用$data【模型数据对象】调才正确
-        // var_dump($data->uid);
+        // var_dump($data->user_id);
 
         // 写法3：调用模型的data方法，并且第二个参数传入true
         // $data1 = $article0->find(260);
-        // $data1->data(['uid' => 1], true);
+        // $data1->data(['user_id' => 1], true);
         // $data1->save(); // 这里save方法没有传入数据，所以不会触发修改器
-        // var_dump($data1->uid);
+        // var_dump($data1->user_id);
 
         // 写法4：调用模型的appendData方法，并且第二个参数传入true
         // $data2 = $article0->find(260);
-        // $data2->appendData(['uid' => 1], true);
+        // $data2->appendData(['user_id' => 1], true);
         // $data2->save(); // 这里save方法没有传入数据，所以不会触发修改器
-        // var_dump($data2->uid);
+        // var_dump($data2->user_id);
 
         // 写法5：调用模型的save方法，并且传入数据；
         // $data3 = $article0->find(260);
-        // $data3->save(['uid' => 1]); // 这里save方法传入数据，会触发修改器
-        // var_dump($data3->uid);
+        // $data3->save(['user_id' => 1]); // 这里save方法传入数据，会触发修改器
+        // var_dump($data3->user_id);
 
         // 写法6：显式调用模型的setAttr方法
         // $data4 = $article0->find(260);
-        // $data4->setAttr('uid', 3, []); // 第三个数组参数，可根据需要传
-        // var_dump($data4->uid);
+        // $data4->setAttr('user_id', 3, []); // 第三个数组参数，可根据需要传
+        // var_dump($data4->user_id);
 
         // 写法7：显式调用模型的setAttrs方法,效果与appendData并传入true的用法相同
         $data4 = $article0->find(260);
         $data4_array = $data4->toArray(); // 触发获取器
         $data4->setAttrs($data4_array); // 触发修改器，这里建议使用一维数组(name必须是字符串，一般对应表字段)，setAttrs循环里还是调用setAttr
-        var_dump($data4->uid);
+        var_dump($data4->user_id);
 
     }
 
@@ -176,9 +176,9 @@ class Mydoc extends SayHelloWorld
      */
     public function searchArticle()
     {
-        $data = Article::withSearch(['title', 'uid', 'num'], [
+        $data = Article::withSearch(['title', 'user_id', 'num'], [
             'title' => Request::post('title'),
-            'uid'   => Request::post('uid'),
+            'user_id'   => Request::post('user_id'),
             'num'   => '1阅读'
         ])->select();
         echo Article::getLastSql();echo "<br/>";
@@ -211,17 +211,34 @@ class Mydoc extends SayHelloWorld
     }
 
     /**
-     * @Func 模型关联
+     * @Func 模型关联一对一
      * @Author WoodSmoke
      * @Time 2023/4/11
-     * @return NULL
+     * @return Null|String|Object
      */
     public function oneToOneRelation()
     {
-        // $user = User::find(2);
-        // var_dump($user->article);echo "<br/>";
-        $article = Article::find(260);
-        var_dump($article->user);echo "<br/>";
-        echo $article->getLastSql();
+        $user = User::find(5);
+        // 注意某些字段可能触发自定义的获取器，比如article_url
+        echo $user->article->num;echo "<br/>";echo "<br/>";
+        var_dump($user->article); // object(app\model\Article)#
+        echo $user->getLastSql();echo "<br/>";echo "<br/>";
+        echo User::getLastSql();echo "<br/>";echo "<br/>";
+    }
+
+    /**
+     * @Func 模型关联一对多
+     * @Author WoodSmoke
+     * @Time 2023/4/24
+     * @return Null|String|Object
+     */
+    public function oneToManyRelation()
+    {
+        
+        // User模型必须使用别名---首字母大写，否则SQL报错。模型查询支持使用数据库查询的查询构造器，所以这里可以使用alias和where等方法。
+        $user = User::has('article', '>=', 2)->alias('User')->where('Article.id', '<=', 10)->select();
+        var_dump($user); // object(think\model\Collection)
+        // 必须用模型对象实例调用getLastSql()，select()查询返回的$user是数据集对象实例,find()查询返回的$article是模型对象实例。
+        echo User::getLastSql(); 
     }
 }
