@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-04-24 16:26:39
+ * @LastEditTime: 2023-04-25 16:59:51
  * @FilePath: /woodsmoke/app/controller/Mydoc.php
  * @Description: 
  * 
@@ -18,6 +18,7 @@ use think\facade\Db;
 use think\facade\Request;
 // use app\controller\SayHelloWorld;
 use app\model\User;
+use think\db\Query;
 
 class Mydoc extends SayHelloWorld
 {
@@ -221,9 +222,36 @@ class Mydoc extends SayHelloWorld
         $user = User::find(5);
         // 注意某些字段可能触发自定义的获取器，比如article_url
         echo $user->article->num;echo "<br/>";echo "<br/>";
-        var_dump($user->article); // object(app\model\Article)#
-        echo $user->getLastSql();echo "<br/>";echo "<br/>";
-        echo User::getLastSql();echo "<br/>";echo "<br/>";
+        // object(app\model\Article)#
+        var_dump($user->article); 
+        // echo $user->getLastSql();echo "<br/>";echo "<br/>";
+        // echo User::getLastSql();echo "<br/>";echo "<br/>";
+
+        // 可以根据关联条件来查询当前模型对象数据,select()返回数据集对象实例
+        $users = User::hasWhere('article', ['user_id'=>5])->select();
+        // var_dump($users);
+        
+        // 表名称已自动设置别名，别名命名规范首字母大写，find()返回模型对象实例
+        $users2 = User::hasWhere('article', function(Query $query){
+            $query->where('Article.id', '=', 3);
+        })->find();
+        // var_dump($users2);
+
+        // 使用预载入查询解决典型的N+1查询问题
+        $users3 = User::with('article')->where('id', 'in', '4,5')->select();
+        // dump($users3);
+
+        // 使用预载入查询解决典型的N+1查询问题,使用闭包对关联模型进行约束.
+        $user4 = User::with(['article' => function(Query $query){
+            $query->group('user_id');
+            $query->order('id desc');
+        }])->whereIN('id', '4,5')->select();
+        foreach($user4 as $user){
+            echo $user->article->num;echo "<br/>";echo "<br/>";
+            // article_url触发了获取器
+            dump($user->article->article_url);echo "<br/>";echo "<br/>";
+        }
+        echo User::getLastSql();
     }
 
     /**
@@ -234,7 +262,7 @@ class Mydoc extends SayHelloWorld
      */
     public function oneToManyRelation()
     {
-        
+    
         // User模型必须使用别名---首字母大写，否则SQL报错。模型查询支持使用数据库查询的查询构造器，所以这里可以使用alias和where等方法。
         $user = User::has('article', '>=', 2)->alias('User')->where('Article.id', '<=', 10)->select();
         var_dump($user); // object(think\model\Collection)
