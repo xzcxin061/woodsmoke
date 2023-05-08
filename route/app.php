@@ -209,6 +209,7 @@ Route::rule('arch/<method>/<id>', 'Copy/<method>', 'GET')->append(['page'=>2])->
 // Route::rule('arch/<method>/<id>', 'Copy/archive');
 // Route::rule('arch/archive/<id>', 'Copy/archive');
 Route::rule('response/param', 'Copy/resparam', 'get');
+
 Route::rule('getuser/:id', 'Copy/getUser', 'get');
 // 测试获取器 2023-2-14
 Route::rule('art/:id', 'Mydoc/getArticle', 'get');
@@ -225,3 +226,4 @@ Route::rule('otore', 'Mydoc/oneToOneRelation', 'get');
 
 Route::rule('otmre', 'Mydoc/oneToManyRelation', 'get');
 
+Route::rule('drawdown', 'Stock/maximumDrawdown', 'get');
