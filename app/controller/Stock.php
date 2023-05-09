@@ -3,7 +3,7 @@
  * @Author: chuiyan 
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-05-09 15:06:10
+ * @LastEditTime: 2023-05-09 15:27:29
  * @FilePath: /woodsmoke/app/controller/Stock.php
  * @Description: 
  * 
@@ -277,11 +277,14 @@ class Stock
             }
         }
 
+        // 导出各列数据---粘贴到txt----excel分列
         // $dateArr = array_column($this->handleFinalArr, 'shouyilv');
         // $dateArr = array_column($this->handleFinalArr, 'shouyie');
-        $dateArr = array_column($this->handleFinalArr, 'maxHuichelv');
+        // $dateArr = array_column($this->handleFinalArr, 'maxHuichelv');
         // $dateArr = array_keys($this->handleFinalArr);
-        dump($dateArr);
+        // dump($dateArr);
+
+        // 结果数组
         // dump($this->handleFinalArr);
     }
 }
