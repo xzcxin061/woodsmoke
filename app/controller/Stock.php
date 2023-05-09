@@ -3,7 +3,7 @@
  * @Author: chuiyan 
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-05-09 11:03:18
+ * @LastEditTime: 2023-05-09 15:06:10
  * @FilePath: /woodsmoke/app/controller/Stock.php
  * @Description: 
  * 
@@ -73,7 +73,7 @@ class Stock
     protected $resultArr = [];
     protected $finalArr = [];
     protected $handleFinalArr = [];
-
+    protected $arr = [];
     // 已弃用：原始投资组合，参数：日期，股数，价格：[code, date, shares, value]
     // protected $originBuyArr = [
     //                                 ['002228', '20210720', 2000, 3.60], 
@@ -196,16 +196,20 @@ class Stock
                 foreach ($value['x'] as $k => $v) {
                     // 每天对应的原始投资额 = 每天的均价 * 每天的持有股数
                     $this->resultArr[$key]['orginAmount'][$v] = $value['junjia'][$v] * $value['shares'][$v];
+
                     // 每天的收盘额 = 每天的收盘价 * 每天的持有股数
                     $this->resultArr[$key]['shoupane'][$v] = $value['y'][$v] * $value['shares'][$v];
                     // 每天的收益额 = 每天的原始投资额 - 每天的收盘额 + 累计盈亏
-                    $this->resultArr[$key]['shouyie'][$v] = round($this->resultArr[$key]['orginAmount'][$v] - $this->resultArr[$key]['shoupane'][$v]
-                                                            , 2);
+                    $this->resultArr[$key]['shouyie'][$v] = round(
+                        $this->resultArr[$key]['shoupane'][$v]
+                        - 
+                        $this->resultArr[$key]['orginAmount'][$v] 
+                    , 2);
                     // 累计盈亏
                     if (!empty(array_filter($this->saleArr)) && !empty($this->saleArr[$key])) {
                         foreach ($this->saleArr[$key] as $val) {
                             if ($val[1] == $v) {
-                                $yingkuieInner += $this->resultArr[$key]['orginAmount'][$v] - $this->resultArr[$key]['shoupane'][$v];                    
+                                $yingkuieInner += $this->resultArr[$key]['shoupane'][$v] - $this->resultArr[$key]['orginAmount'][$v];                    
                             } 
                             $this->resultArr[$key]['yingkuie'][$v] = $yingkuieInner;
                         }
@@ -234,6 +238,7 @@ class Stock
                 }
                 $this->handleFinalArr[$key]['shouyilv'] = $shouyilv;
                 $this->handleFinalArr[$key]['shouyie'] = $shouyie;
+                $this->handleFinalArr[$key]['orginAmount'] = $orginAmount;
             }
         }
 
@@ -245,17 +250,38 @@ class Stock
                 if ($key == "20".$this->stopTime) {
                     $value['maxHuichelv'] = 0.0000;
                 } else {
-                    $childrenArr = array_slice($this->handleFinalArr, $keysReverse[$key] + 1, $size - ($keysReverse[$key] + 1), true);
+                    $childrenArr = array_slice($this->handleFinalArr, $keysReverse[$key], $size - $keysReverse[$key], true);
                     $minShouyilv = min($childrenArr);
-                    if ($value['shouyilv'] - $minShouyilv['shouyilv'] >= 0) {
-                        $value['maxHuichelv'] = round($value['shouyilv'] - $minShouyilv['shouyilv'], 4);
+                    $maxShouyilv = max($childrenArr);
+                    // $value['maxHuichelv'] = round(
+                    //     (
+                    //         1 - abs($value['orginAmount'] + $minShouyilv['shouyie']) 
+                    //             / 
+                    //             abs($value['orginAmount'] + $maxShouyilv['shouyie'])
+                    //     )
+                    // , 4);
+// dump($minShouyilv['shouyie']);
+                    if ($value['shouyie'] - $minShouyilv['shouyie']  >= 0) {
+                        $value['maxHuichelv'] = round(
+                            (
+                                1 - abs($value['orginAmount'] + $minShouyilv['shouyie']) 
+                                    / 
+                                    abs($value['orginAmount'] + $value['shouyie'])
+                            )
+                        , 4);
                     } else {
                         $value['maxHuichelv'] = 0.0000;
                     }
                 }
                 $this->handleFinalArr[$key] = $value;
             }
-        }        
-        dump($this->handleFinalArr);
+        }
+
+        // $dateArr = array_column($this->handleFinalArr, 'shouyilv');
+        // $dateArr = array_column($this->handleFinalArr, 'shouyie');
+        $dateArr = array_column($this->handleFinalArr, 'maxHuichelv');
+        // $dateArr = array_keys($this->handleFinalArr);
+        dump($dateArr);
+        // dump($this->handleFinalArr);
     }
 }
