@@ -3,7 +3,7 @@
  * @Author: chuiyan 
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-05-09 15:27:29
+ * @LastEditTime: 2023-05-10 12:27:45
  * @FilePath: /woodsmoke/app/controller/Stock.php
  * @Description: 
  * 
@@ -250,21 +250,15 @@ class Stock
                 if ($key == "20".$this->stopTime) {
                     $value['maxHuichelv'] = 0.0000;
                 } else {
-                    $childrenArr = array_slice($this->handleFinalArr, $keysReverse[$key], $size - $keysReverse[$key], true);
-                    $minShouyilv = min($childrenArr);
-                    $maxShouyilv = max($childrenArr);
-                    // $value['maxHuichelv'] = round(
-                    //     (
-                    //         1 - abs($value['orginAmount'] + $minShouyilv['shouyie']) 
-                    //             / 
-                    //             abs($value['orginAmount'] + $maxShouyilv['shouyie'])
-                    //     )
-                    // , 4);
-// dump($minShouyilv['shouyie']);
-                    if ($value['shouyie'] - $minShouyilv['shouyie']  >= 0) {
+                    // 投资时间平移的最大回撤率
+                    $childrenArr = array_slice(array_column($this->handleFinalArr, 'shouyie'), $keysReverse[$key], $size - $keysReverse[$key], true);
+                    // 收益额放在数组第一个了，优先按收益额取min
+                    $minShouyie = min($childrenArr);
+                    // $maxShouyie = max($childrenArr);
+                    if ($value['shouyie'] - $minShouyie >= 0) {
                         $value['maxHuichelv'] = round(
                             (
-                                1 - abs($value['orginAmount'] + $minShouyilv['shouyie']) 
+                                1 - abs($value['orginAmount'] + $minShouyie) 
                                     / 
                                     abs($value['orginAmount'] + $value['shouyie'])
                             )
@@ -272,6 +266,19 @@ class Stock
                     } else {
                         $value['maxHuichelv'] = 0.0000;
                     }
+                    // 投资时间固定的最大回车率
+                    $forwardChilrenArr = array_slice(array_column($this->handleFinalArr, 'shouyie'), 0, $keysReverse[$key] + 1, true);
+                    $forwardMinShouyie = min($forwardChilrenArr);
+                    $forwardMaxShouyie = max($forwardChilrenArr);
+
+                    $value['forwardMaxHuichelv'] = round(
+                        (
+                            1 - abs($value['orginAmount'] + $forwardMinShouyie) 
+                                / 
+                                abs($value['orginAmount'] + $forwardMaxShouyie)
+                        )
+                    , 4);
+                    
                 }
                 $this->handleFinalArr[$key] = $value;
             }
@@ -282,7 +289,8 @@ class Stock
         // $dateArr = array_column($this->handleFinalArr, 'shouyie');
         // $dateArr = array_column($this->handleFinalArr, 'maxHuichelv');
         // $dateArr = array_keys($this->handleFinalArr);
-        // dump($dateArr);
+        $dateArr = array_column($this->handleFinalArr, 'forwardMaxHuichelv');
+        dump($dateArr);
 
         // 结果数组
         // dump($this->handleFinalArr);
