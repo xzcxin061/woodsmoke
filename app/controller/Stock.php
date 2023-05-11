@@ -3,7 +3,7 @@
  * @Author: chuiyan 
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-05-10 12:27:45
+ * @LastEditTime: 2023-05-11 15:18:40
  * @FilePath: /woodsmoke/app/controller/Stock.php
  * @Description: 
  * 
@@ -12,7 +12,7 @@
 
 namespace app\controller;
 
-use app\model\StockDaily;
+use app\model\Daily;
 
 class Stock
 {
@@ -95,7 +95,7 @@ class Stock
     public function maximumDrawdown ()
     {
         // 获取指定股票收盘价，@return 包含模型的数据集
-        $data = StockDaily::withSearch( ['date', 'stockcode'], 
+        $data = Daily::withSearch( ['date', 'stockcode'], 
                                         ['date'=>[$this->startTime, $this->stopTime], 'stockcode'=>$this->stockCodeStr]
                             )
                         ->field('date, stockcode, close')

@@ -3,8 +3,8 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2023-02-14 16:17:34
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-04-28 11:58:02
- * @FilePath: /woodsmoke/app/model/StockDaily.php
+ * @LastEditTime: 2023-05-11 15:18:25
+ * @FilePath: /woodsmoke/app/model/Daily.php
  * @Description: 
  * 
  * Copyright (c) 2023 by xzcxin061@163.com, All Rights Reserved. 
@@ -17,7 +17,7 @@ use think\facade\Config;
 use think\Exception;
 
 
-class StockDaily extends Model
+class Daily extends Model
 {
     // 设置连接2
     protected $connection = "stock";
