@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2023-02-14 16:17:34
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-05-11 15:18:25
+ * @LastEditTime: 2023-05-17 09:58:31
  * @FilePath: /woodsmoke/app/model/Daily.php
  * @Description: 
  * 
@@ -72,10 +72,10 @@ class Daily extends Model
      */
     public function searchDateAttr($query, $value, $data)
     {
-        if(is_array($value)){
+        if (is_array($value)) {
             // 查询时间范围
             $query->whereBetween('date', $value);
-        }elseif(is_string($value)){
+        } elseif (is_string($value)) {
             // 查询时间
             $query->where('date', '=', $value);
         }

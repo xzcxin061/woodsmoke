@@ -3,7 +3,7 @@
  * @Author: chuiyan xzcxin061@163.com
  * @Date: 2022-04-08 16:51:27
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-05-08 18:54:36
+ * @LastEditTime: 2023-05-15 17:43:22
  * @FilePath: /woodsmoke/app/common.php
  * @Description: 
  * 
@@ -34,9 +34,20 @@
 //  }
 
  /**
-  * 
+  * @author woodsmoke
+  * 功能描述：获取已有日期中每个月的最后一天
+  * @param $array 需要查询的数组
+  * @param $status true|false 完整自然月的日期|当月部分日期
+  * @return array 
   */
-// function array_find($arr, $key)
-// {
-    
-// }
+function get_maxdate_by_month($array, $status = false)
+{
+    // foreach () {
+      
+    // }
+    // if ($status) {
+      
+    // } else {
+
+    // }
+}
