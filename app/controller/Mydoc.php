@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-04-27 12:09:01
+ * @LastEditTime: 2023-05-18 11:34:22
  * @FilePath: /woodsmoke/app/controller/Mydoc.php
  * @Description: 
  * 
@@ -93,19 +93,25 @@ class Mydoc extends SayHelloWorld
             var_dump($val->article_url.$key);echo "<br/>";echo "<br/>";
             var_dump($val->id.$key);echo "<br/>";echo "<br/>";
         }
-        // var_dump($array);
+        var_dump($array);
+        // echo "<br/>";echo "<br/>";echo "<br/>";echo "<br/>";echo "<br/>";echo "<br/>";echo "<br/>";echo "<br/>";
 
         /**
-         * 下面这种方式不会报错，但是实际上没有经过动态获取器处理，是一个普通的模型查询
+         * 下面这种方式不会报错，但是实际上从第2个withAttr开始动态获取器不会生效。
+         * 先经过获取器处理，找不到获取器，只有第一个动态获取器withAttr生效。
          * 注意$array返回数据和上边不一样
          */
-        $array = $article->withAttr('article_url', function($value, $data){
-            return $value;
-        })->withAttr('id', function($value, $data){
-            return $value."~~~~";
-        })->limit(3)->select();
+        // $array = $article->withAttr('article_url', function($value, $data){
+        //     return $value;
+        // })->withAttr('id', function($value, $data){
+        //     return $value."~~~~";
+        // })->limit(3)->select();
         // // 不通过获取器也能获取，获取器是为了特殊处理
-        // var_dump($array);
+        // foreach($array as $key=>$val){
+        //     var_dump($val->article_url['article_url'].$key);echo "<br/>";echo "<br/>";
+        //     var_dump($val->id.$key);echo "<br/>";echo "<br/>";
+        // }
+        // dump($array);
 
         /**
          * 另外注意，withAttr方法之后不能再使用模型的查询方法，必须使用Db类的查询方法。

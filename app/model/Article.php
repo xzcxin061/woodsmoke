@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2023-02-14 16:17:34
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-04-19 14:08:03
+ * @LastEditTime: 2023-05-18 11:35:25
  * @FilePath: /woodsmoke/app/model/Article.php
  * @Description: 
  * 
@@ -97,4 +97,5 @@ class Article extends Model
     //     // 主键：当前模型主键，默认会自动获取也可以指定传入
     //     return $this->hasOne(User::class, 'id', 'user_id'); // 这里官方文档没有说明取谁的外键，测试主键取主表article的外键user_id，外键取子表user的主键id，这是由数据表结构决定的，所以不建议用反转主表和子表的写法。
     // }
+
 }

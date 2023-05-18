@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2023-02-14 16:17:34
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-05-17 09:58:31
+ * @LastEditTime: 2023-05-18 12:11:43
  * @FilePath: /woodsmoke/app/model/Daily.php
  * @Description: 
  * 
@@ -88,4 +88,6 @@ class Daily extends Model
         // 格式化成21世纪标准时间
         return '20'.$value;
     }
+
+    
 }

@@ -3,7 +3,7 @@
  * @Author: chuiyan 
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-05-17 15:24:47
+ * @LastEditTime: 2023-05-18 18:16:45
  * @FilePath: /woodsmoke/app/controller/Stock.php
  * @Description: 
  * 
@@ -66,25 +66,15 @@ class Stock
     //    '601319' => ['601319', '20220602', 6500, 4.61], 
     //    '601688' => ['601688', '20220602', 2200, 13.32], 
     // ];
-    protected $handleBuyArr = [];
-    protected $buyArr = [];
-    protected $saleArr = [];
+    protected $handleBuyArr = []; // 原始投资组合数组
+    protected $buyArr = []; // 买入记录数组
+    protected $saleArr = []; // 卖出记录数组
 
     // 公用变量
-    protected $resultArr = [];
-    protected $finalArr = [];
-    protected $handleFinalArr = [];
-    protected $arr = [];
-    // 已弃用：原始投资组合，参数：日期，股数，价格：[code, date, shares, value]
-    // protected $originBuyArr = [
-    //                                 ['002228', '20210720', 2000, 3.60], 
-    //                                 ['002228', '20210720', 3000, 3.54], 
-    //                                 ['002345', '20210720', 3000, 5.85],
-    //                                 ['600016', '20210720', 2000, 4.17],
-    //                                 ['600668', '20210720', 1000, 11.14],
-    //                                 ['601186', '20210720', 5000, 7.29],
-    //                                 ['601336', '20210720', 1500, 44.48]
-    //                             ]; 
+    protected $resultArr = []; // 投资组合处理过渡数组
+    protected $finalArr = []; // 投资组合处理过渡数组
+    protected $handleFinalArr = []; // 投资组合处理过渡数组
+
     protected $singlePrice = 30000;
     protected $unitGroup = 100;
 
@@ -97,7 +87,7 @@ class Stock
      */
     public function maximumDrawdown ()
     {
-        // 初始化买入数组
+        // 初始化买入数组，投资组合不会为空
         $orignArr = Daily::withSearch(['stockcode','date', 'close'], ['stockcode'=>$this->stockCodeStr, 'date' => $this->startTime])
                         ->field('date, stockcode, close') 
                         ->select();
@@ -119,7 +109,6 @@ class Stock
                 $this->resultArr[$val->stockcode]['x'][$val->date] = $val->date;
                 // y轴：收盘价
                 $this->resultArr[$val->stockcode]['y'][$val->date] = $val->close;
-                
                 // 计算每天的持有股数,默认等于初始买入股数
                 $this->resultArr[$val->stockcode]['shares'][$val->date] = $this->handleBuyArr[$val->stockcode][2];
                 // 处理买入数据，每天
@@ -231,28 +220,35 @@ class Stock
                     // 每天的收益率 = 每天的收益额 / 每天的原始投资额
                     $this->finalArr[$v][$key]['shouyie'] = $this->resultArr[$key]['shouyie'][$v];
                     $this->finalArr[$v][$key]['orginAmount'] = $this->resultArr[$key]['orginAmount'][$v];
+                    $this->finalArr[$v][$key]['shoupane'] = $this->resultArr[$key]['shoupane'][$v];
                 }
 
             }
         }
+
+        // 取上一个foreach结果继续处理
         if (!empty(array_filter($this->finalArr))) {
             foreach ($this->finalArr as $key => $value) {
                 $shouyie = 0.00;
                 $orginAmount = 0.00;
                 $shouyilv = 0.0000;
+                $shoupane = 0.00;
                 if (!empty(array_filter($value))) {
                     foreach ($value as $k => $v) {
                         $shouyie += $v['shouyie'];
                         $orginAmount += $v['orginAmount'];
+                        $shoupane += $v['shoupane'];
                     }
                     $shouyilv = round($shouyie / $orginAmount, 4);
                 }
                 $this->handleFinalArr[$key]['shouyilv'] = $shouyilv;
                 $this->handleFinalArr[$key]['shouyie'] = $shouyie;
                 $this->handleFinalArr[$key]['orginAmount'] = $orginAmount;
+                $this->handleFinalArr[$key]['shoupane'] = $shoupane;
             }
         }
 
+        // 取上一个foreach结果继续处理
         if (!empty($this->handleFinalArr)) {
             $size = sizeof($this->handleFinalArr);
             $keys = array_keys($this->handleFinalArr);
@@ -289,48 +285,118 @@ class Stock
                     } else {
                         $value['maxHuichelv'] = 0.0000;
                     }
-                    
                 }
                 $this->handleFinalArr[$key] = $value;
             }
         }
 
-        // 导出各列数据---粘贴到txt----excel分列
+        // ----------------【导出各列数据】---粘贴到txt----excel分列开始------------------
         // $dateArr = array_column($this->handleFinalArr, 'shouyilv');
         // $dateArr = array_column($this->handleFinalArr, 'shouyie');
         // $dateArr = array_column($this->handleFinalArr, 'maxHuichelv');
-        $dateArr = array_keys($this->handleFinalArr);
+        // $dateArr = array_keys($this->handleFinalArr);
         // $dateArr = array_column($this->handleFinalArr, 'forwardMaxHuichelv');
+        // ----------------【导出各列数据】---粘贴到txt----excel分列结束------------------
+
+
         // 分析夏普比率 = {净值增长率的平均值 - 银行同期利率） / 净值增长率的标准差
             // 组合的预期收益率或者平均报酬率：净值增长率的平均值
             // 无风险报酬率：银行同期利率
             // 标准差或者波动率：净值增长率的标准差
         // 比较不同的组合有意义，超过最小无风险收益，每多承担一单位风险，对应有多少回报。
         // 计算标准差的具体方法如下：
-        //     1. 计算每个月的收益率，即每个月的收益率 = （该月收盘价 - 上个月收盘价）/ 上个月收盘价
-        //     2. 计算每个月的平均收益率，即平均收益率 = 所有月份的收益率之和 / 月份总数
-        //     3. 计算每个月的收益率与平均收益率的差值，即每个月的差值 = 该月收益率 - 平均收益率
-        //     4. 将每个月的差值平方，然后将所有的平方和加起来，得到方差
-        //     5. 将方差除以月份总数，然后取平方根，得到标准差
-        //     注意：在计算标准差时，需要将每个月的收益率转化为年化收益率，即年化收益率 = 月收益率 * 12。 
-        $shouyilvArr = array_column($this->handleFinalArr, 'shouyilv');
-        $sumRatio = array_sum($shouyilvArr);
-        $lenRatio = count($shouyilvArr);
-        $averageRatio = round($sumRatio / $lenRatio, 2);
-        $handleDateArr = [];
-        if ($averageRatio < -30.00) {
-            // 夏普比率小于0没有意义
-            $sharpeRatio = "0.00"."%";
+            // 1. 计算每个月的收益率，即每个月的收益率 = （该月收盘价 - 上个月收盘价）/ 上个月收盘价
+            // 2. 计算每个月的平均收益率，即平均收益率 = 所有月份的收益率之和 / 月份总数
+            // 3. 计算每个月的收益率与平均收益率的差值，即每个月的差值 = 该月收益率 - 平均收益率
+            // 4. 将每个月的差值平方，然后将所有的平方和加起来，得到方差
+            // 5. 将方差除以月份总数，然后取平方根，得到标准差
+        // 注意：在计算标准差时，需要将每个月的收益率转化为年化收益率，即年化收益率 = 月收益率 * 12。 
+
+        // 设置组合预期收益率
+        $expectRatio = 0.034300;
+        // $expectRatio = 0.150000;
+        // 设置银行同期利率
+        $bankRatio = 0.030000;
+
+        // -----------------------写法1开始-------------------------------------
+        $latestDayObj = Daily::field('max(date) date')
+                        ->whereBetween('date', [$this->startTime, $this->stopTime])
+                        ->whereIN('stockcode', $this->stockCodeArr)
+                        ->group('left(concat(20, date), 6)')
+                        ->select()
+                        ->withAttr('date', function($value, $data){
+                            return '20'.$value;
+                        });
+        // 不用判断latestDayObj，初始数据一定不为空
+        if ($this->startTime != $this->stopTime) {
+            $latestDayArr = array_merge(
+                array(
+                    array('date' => '20'.$this->startTime)
+                ), 
+                $latestDayObj->toArray()
+            );
         } else {
-            // $conut = count($dateArr);
-            // $handleDateArr = array_walk($dateArr, function (&$value, $key) {
-            //     $value = substr($value, 0, 6);
-            // });
-            // $childrenDateArr = array_merge(array_slice($dateArr, 1, $conut - 1), array($conut - 1 => $dateArr[$conut - 1]));
-            // $handleChildren = array_walk($childrenDateArr, function (&$value, $key) {
-            //     $value = substr($value, 0, 6);
-            // });
-            
+            // 经过动态获取器处理
+            $latestDayArr = $latestDayObj->toArray();
         }
+        // -----------------------写法1结束-------------------------------------
+
+        // -----------------------写法2开始-------------------------------------
+        // $latestDayObj = Daily::field('max(date) date')
+        // ->whereBetween('date', [$this->startTime, $this->stopTime])
+        // ->whereIN('stockcode', $this->stockCodeArr)
+        // ->group('left(concat(20, date), 6)')
+        // ->select();                        
+        // // 不用判断latestDayObj，初始数据一定不为空
+        // if ($this->startTime != $this->stopTime) {
+        //     $latestDayArr = array_merge(array(array('date' => '20'.$this->startTime)), $latestDayObj->toArray());
+        // } else {
+        //     // 经过获取器处理
+        //     $latestDayArr = $latestDayObj->toArray();
+        // }
+        // -----------------------写法2结束-------------------------------------
+        
+        foreach ($latestDayArr as $key => &$value) {
+            $value['shoupane'] = $this->handleFinalArr[$value['date']]['shoupane'];
+            $latestDayArr[$key] = $value;
+        }
+        // 1.月收益率，因为是组合投资，用收盘额取代收盘价计算更合理
+        for ($i = 0; $i < count($latestDayArr) - 1; $i++) {
+            $latestDayArr[0]['shouyilvMonth'] = 0.0000;
+            $latestDayArr[$i+1]['shouyilvMonth'] = round(
+                                                        ($latestDayArr[$i+1]['shoupane'] - $latestDayArr[$i]['shoupane'])  
+                                                        / 
+                                                        $latestDayArr[$i]['shoupane'], 
+                                                    4);
+        }
+
+        // 2.平均收益率 3.差值、差值平方
+        $shouyilvMonth = array_column($latestDayArr, 'shouyilvMonth');
+        $shouyilvAverage = round(array_sum($shouyilvMonth) / (count($shouyilvMonth) - 1), 4);
+        for ($i = 0; $i < count($latestDayArr) - 1; $i++) {
+            $latestDayArr[0]['shouyilvAverage'] = 0.0000;
+            $latestDayArr[$i+1]['shouyilvAverage'] = $shouyilvAverage;
+            $latestDayArr[0]['shouyilvDiff'] = 0.0000;
+            $latestDayArr[$i+1]['shouyilvDiff'] = $latestDayArr[$i+1]['shouyilvMonth'] - $shouyilvAverage;
+            $latestDayArr[0]['shouyilvPow'] = 0.0000;
+            $latestDayArr[$i+1]['shouyilvPow'] = round(pow($latestDayArr[$i+1]['shouyilvDiff'], 2), 6);
+        }
+        // 4.每个月的差值求方差
+        $shouyilvPow = array_column($latestDayArr, 'shouyilvPow');
+        $shouyilvSumPow = array_sum($shouyilvPow);
+        // 5.求标准差或波动率
+        $shouyilvStandardDeviation = round(sqrt($shouyilvSumPow / (count($shouyilvMonth) - 1)), 6);
+        // 夏普比率
+        // if ($shouyilvAverage < $bankRatio) {
+        //     // 夏普比率小于0没有意义
+        //     $sharpeRatio = 0.000000;
+        // } else {
+        //     $sharpeRatio = round(($expectRatio - $bankRatio) / $shouyilvStandardDeviation, 6);
+        // }
+        $sharpeRatio = round(($expectRatio - $bankRatio) / $shouyilvStandardDeviation, 6);
+        dump("【组合预期收益率】".$expectRatio);
+        dump("【银行同期收益率】".$bankRatio);
+        dump("【标准差或波动率】".$shouyilvStandardDeviation);
+        dump("【夏普比率】".$sharpeRatio);
     }
 }
