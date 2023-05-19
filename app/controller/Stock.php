@@ -3,7 +3,7 @@
  * @Author: chuiyan 
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-05-19 10:52:20
+ * @LastEditTime: 2023-05-19 11:09:16
  * @FilePath: /woodsmoke/app/controller/Stock.php
  * @Description: 
  * 
@@ -77,7 +77,10 @@ class Stock
 
     protected $singlePrice = 30000;
     protected $unitGroup = 100;
-
+    // 设置组合预期收益率
+    protected $expectRatio = 0.034300;
+    // 设置银行同期利率
+    protected $bankRatio = 0.030000;    
     /**
      * @Func 股票投资组合最大回撤率：在选定周期内任一历史时点往后推，产品净值走到最低点时的收益率回撤幅度的最大值。
      * @Describe 导出图表和数据，也可能会拆分该函数
@@ -88,23 +91,23 @@ class Stock
     public function maximumDrawdown ()
     {
         // 初始化买入数组，投资组合不会为空
-        $orignArr = Daily::withSearch(['stockcode','date', 'close'], ['stockcode'=>$this->stockCodeStr, 'date' => $this->startTime])
+        $orignObj = Daily::withSearch(['stockcode','date', 'close'], ['stockcode'=>$this->stockCodeStr, 'date' => $this->startTime])
                         ->field('date, stockcode, close') 
                         ->select();
-        foreach ($orignArr->toArray() as $key => $value) {
+        foreach ($orignObj->toArray() as $key => $value) {
             $this->handleBuyArr[$value['stockcode']] = [$value['stockcode'], $value['date'], floor($this->singlePrice / ($value['close'] * $this->unitGroup)) * 100, $value['close']];
         }
 
         // 获取指定股票收盘价，@return 包含模型的数据集
-        $data = Daily::withSearch( ['date', 'stockcode'], 
+        $dataObj = Daily::withSearch( ['date', 'stockcode'], 
                                         ['date'=>[$this->startTime, $this->stopTime], 'stockcode'=>$this->stockCodeStr]
                             )
                         ->field('date, stockcode, close')
                         ->select();
         // $resultArr数组赋值
-        if (!$data->isEmpty()) {
+        if (!$dataObj->isEmpty()) {
             // 先不考虑添加原始投资组合之外的股票stockcode
-            foreach ($data AS &$val) {
+            foreach ($dataObj as &$val) {
                 // x轴：时间
                 $this->resultArr[$val->stockcode]['x'][$val->date] = $val->date;
                 // y轴：收盘价
@@ -184,19 +187,12 @@ class Stock
 
         // 分析思路
         // 
-        if (!empty(array_filter($this->resultArr))) {
-            // $orginAmountOuter = 0.00;
-            // $shoupaneOuter = 0.00;
-            // $shouyieOuter = 0.00;
-            // $shouyilvOuter = 0.0000;            
+        if (!empty(array_filter($this->resultArr))) {         
             foreach ($this->resultArr as $key => &$value) {
                 $yingkuieInner = 0.00;
-                // $shouyieInner = 0.00;
-                // $orginAmountInner = 0.00;
                 foreach ($value['x'] as $k => $v) {
                     // 每天对应的原始投资额 = 每天的均价 * 每天的持有股数
                     $this->resultArr[$key]['orginAmount'][$v] = $value['junjia'][$v] * $value['shares'][$v];
-
                     // 每天的收盘额 = 每天的收盘价 * 每天的持有股数
                     $this->resultArr[$key]['shoupane'][$v] = $value['y'][$v] * $value['shares'][$v];
                     // 每天的收益额 = 每天的原始投资额 - 每天的收盘额 + 累计盈亏
@@ -216,7 +212,6 @@ class Stock
                     }
                     // 更新收益额
                     $this->resultArr[$key]['shouyie'][$v] = $this->resultArr[$key]['shouyie'][$v] + $yingkuieInner;
-
                     // 每天的收益率 = 每天的收益额 / 每天的原始投资额
                     $this->finalArr[$v][$key]['shouyie'] = $this->resultArr[$key]['shouyie'][$v];
                     $this->finalArr[$v][$key]['orginAmount'] = $this->resultArr[$key]['orginAmount'][$v];
@@ -291,13 +286,12 @@ class Stock
         }
 
         // ----------------【导出各列数据】---粘贴到txt----excel分列开始------------------
-        dump("【收益率】");dump(array_column($this->handleFinalArr, 'shouyilv'));
-        dump("【收益额】");dump(array_column($this->handleFinalArr, 'shouyie'));
+        dump("【1.年化收益率】");dump(array_column($this->handleFinalArr, 'shouyilv'));
+        dump("【2.累计收益额】");dump(array_column($this->handleFinalArr, 'shouyie'));
         dump("【最大回撤率-投资日变化】");dump(array_column($this->handleFinalArr, 'maxHuichelv'));
         $dateArr = array_keys($this->handleFinalArr);
-        dump("【最大回撤率-投资日固定】");dump(array_column($this->handleFinalArr, 'forwardMaxHuichelv'));
+        dump("【3.最大回撤率-投资日固定】");dump(array_column($this->handleFinalArr, 'forwardMaxHuichelv'));
         // ----------------【导出各列数据】---粘贴到txt----excel分列结束------------------
-
 
         // 分析夏普比率 = {净值增长率的平均值 - 银行同期利率） / 净值增长率的标准差
             // 组合的预期收益率或者平均报酬率：净值增长率的平均值
@@ -311,12 +305,6 @@ class Stock
             // 4. 将每个月的差值平方，然后将所有的平方和加起来，得到方差
             // 5. 将方差除以月份总数，然后取平方根，得到标准差
         // 注意：在计算标准差时，需要将每个月的收益率转化为年化收益率，即年化收益率 = 月收益率 * 12。 
-
-        // 设置组合预期收益率
-        $expectRatio = 0.034300;
-        // $expectRatio = 0.150000;
-        // 设置银行同期利率
-        $bankRatio = 0.030000;
 
         // -----------------------写法1开始-------------------------------------
         $latestDayObj = Daily::field('max(date) date')
@@ -371,8 +359,8 @@ class Stock
         }
 
         // 2.平均收益率 3.差值、差值平方
-        $shouyilvMonth = array_column($latestDayArr, 'shouyilvMonth');
-        $shouyilvAverage = round(array_sum($shouyilvMonth) / (count($shouyilvMonth) - 1), 4);
+        $shouyilvMonthArr = array_column($latestDayArr, 'shouyilvMonth');
+        $shouyilvAverage = round(array_sum($shouyilvMonthArr) / (count($shouyilvMonthArr) - 1), 4);
         for ($i = 0; $i < count($latestDayArr) - 1; $i++) {
             $latestDayArr[0]['shouyilvAverage'] = 0.0000;
             $latestDayArr[$i+1]['shouyilvAverage'] = $shouyilvAverage;
@@ -382,15 +370,15 @@ class Stock
             $latestDayArr[$i+1]['shouyilvPow'] = round(pow($latestDayArr[$i+1]['shouyilvDiff'], 2), 6);
         }
         // 4.每个月的差值求方差
-        $shouyilvPow = array_column($latestDayArr, 'shouyilvPow');
-        $shouyilvSumPow = array_sum($shouyilvPow);
+        $shouyilvPowArr = array_column($latestDayArr, 'shouyilvPow');
+        $shouyilvSumPow = array_sum($shouyilvPowArr);
         // 5.求标准差或波动率
-        $shouyilvStandardDeviation = round(sqrt($shouyilvSumPow / (count($shouyilvMonth) - 1)), 6);
+        $shouyilvStandardDeviation = round(sqrt($shouyilvSumPow / (count($shouyilvMonthArr) - 1)), 6);
         // 夏普比率
-        $sharpeRatio = round(($expectRatio - $bankRatio) / $shouyilvStandardDeviation, 6);
-        dump("【组合预期收益率】");dump($expectRatio);
-        dump("【银行同期收益率】");dump($bankRatio);
-        dump("【标准差或波动率】");dump($shouyilvStandardDeviation);
-        dump("【夏普比率】");dump($sharpeRatio);
+        $sharpeRatio = round(($this->expectRatio - $this->bankRatio) / $shouyilvStandardDeviation, 6);
+        dump("【组合预期收益率】");dump($this->expectRatio);
+        dump("【银行同期收益率】");dump($this->bankRatio);
+        dump("【4.标准差或波动率】");dump($shouyilvStandardDeviation);
+        dump("【5.夏普比率】");dump($sharpeRatio);
     }
 }
