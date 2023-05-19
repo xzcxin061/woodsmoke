@@ -3,7 +3,7 @@
  * @Author: chuiyan 
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-05-18 18:16:45
+ * @LastEditTime: 2023-05-19 10:52:20
  * @FilePath: /woodsmoke/app/controller/Stock.php
  * @Description: 
  * 
@@ -291,11 +291,11 @@ class Stock
         }
 
         // ----------------【导出各列数据】---粘贴到txt----excel分列开始------------------
-        // $dateArr = array_column($this->handleFinalArr, 'shouyilv');
-        // $dateArr = array_column($this->handleFinalArr, 'shouyie');
-        // $dateArr = array_column($this->handleFinalArr, 'maxHuichelv');
-        // $dateArr = array_keys($this->handleFinalArr);
-        // $dateArr = array_column($this->handleFinalArr, 'forwardMaxHuichelv');
+        dump("【收益率】");dump(array_column($this->handleFinalArr, 'shouyilv'));
+        dump("【收益额】");dump(array_column($this->handleFinalArr, 'shouyie'));
+        dump("【最大回撤率-投资日变化】");dump(array_column($this->handleFinalArr, 'maxHuichelv'));
+        $dateArr = array_keys($this->handleFinalArr);
+        dump("【最大回撤率-投资日固定】");dump(array_column($this->handleFinalArr, 'forwardMaxHuichelv'));
         // ----------------【导出各列数据】---粘贴到txt----excel分列结束------------------
 
 
@@ -387,16 +387,10 @@ class Stock
         // 5.求标准差或波动率
         $shouyilvStandardDeviation = round(sqrt($shouyilvSumPow / (count($shouyilvMonth) - 1)), 6);
         // 夏普比率
-        // if ($shouyilvAverage < $bankRatio) {
-        //     // 夏普比率小于0没有意义
-        //     $sharpeRatio = 0.000000;
-        // } else {
-        //     $sharpeRatio = round(($expectRatio - $bankRatio) / $shouyilvStandardDeviation, 6);
-        // }
         $sharpeRatio = round(($expectRatio - $bankRatio) / $shouyilvStandardDeviation, 6);
-        dump("【组合预期收益率】".$expectRatio);
-        dump("【银行同期收益率】".$bankRatio);
-        dump("【标准差或波动率】".$shouyilvStandardDeviation);
-        dump("【夏普比率】".$sharpeRatio);
+        dump("【组合预期收益率】");dump($expectRatio);
+        dump("【银行同期收益率】");dump($bankRatio);
+        dump("【标准差或波动率】");dump($shouyilvStandardDeviation);
+        dump("【夏普比率】");dump($sharpeRatio);
     }
 }
