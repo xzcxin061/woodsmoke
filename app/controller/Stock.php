@@ -3,7 +3,7 @@
  * @Author: chuiyan 
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-05-19 11:56:17
+ * @LastEditTime: 2023-05-19 12:01:06
  * @FilePath: /woodsmoke/app/controller/Stock.php
  * @Description: 
  * 
@@ -289,8 +289,8 @@ class Stock
         dump("【1.年化收益率】");dump(array_column($this->handleFinalArr, 'shouyilv'));
         dump("【2.累计收益额】");dump(array_column($this->handleFinalArr, 'shouyie'));
         dump("【最大回撤率-投资日变化】");dump(array_column($this->handleFinalArr, 'maxHuichelv'));
-        dump("【投资日期】");dump(array_keys($this->handleFinalArr));
-        dump("【3.最大回撤率-投资日固定】");dump(array_column($this->handleFinalArr, 'forwardMaxHuichelv'));
+        $dateArr = array_keys($this->handleFinalArr);
+        dump("【最大回撤率-投资日固定】");dump(array_column($this->handleFinalArr, 'forwardMaxHuichelv'));
         // ----------------【导出各列数据】---粘贴到txt----excel分列结束------------------
 
         // 分析夏普比率 = {净值增长率的平均值 - 银行同期利率） / 净值增长率的标准差
