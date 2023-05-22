@@ -3,7 +3,7 @@
  * @Author: chuiyan 
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-05-19 12:01:06
+ * @LastEditTime: 2023-05-22 18:35:23
  * @FilePath: /woodsmoke/app/controller/Stock.php
  * @Description: 
  * 
@@ -13,6 +13,7 @@
 namespace app\controller;
 
 use app\model\Daily;
+use think\facade\View;
 
 class Stock
 {
@@ -286,11 +287,11 @@ class Stock
         }
 
         // ----------------【导出各列数据】---粘贴到txt----excel分列开始------------------
-        dump("【1.年化收益率】");dump(array_column($this->handleFinalArr, 'shouyilv'));
-        dump("【2.累计收益额】");dump(array_column($this->handleFinalArr, 'shouyie'));
-        dump("【最大回撤率-投资日变化】");dump(array_column($this->handleFinalArr, 'maxHuichelv'));
-        $dateArr = array_keys($this->handleFinalArr);
-        dump("【最大回撤率-投资日固定】");dump(array_column($this->handleFinalArr, 'forwardMaxHuichelv'));
+        // dump("【1.年化收益率】");dump(array_column($this->handleFinalArr, 'shouyilv'));
+        // dump("【2.累计收益额】");dump(array_column($this->handleFinalArr, 'shouyie'));
+        // dump("【最大回撤率-投资日变化】");dump(array_column($this->handleFinalArr, 'maxHuichelv'));
+        // $dateArr = array_keys($this->handleFinalArr);
+        // dump("【最大回撤率-投资日固定】");dump(array_column($this->handleFinalArr, 'forwardMaxHuichelv'));
         // ----------------【导出各列数据】---粘贴到txt----excel分列结束------------------
 
         // 分析夏普比率 = {净值增长率的平均值 - 银行同期利率） / 净值增长率的标准差
@@ -376,9 +377,19 @@ class Stock
         $shouyilvStandardDeviation = round(sqrt($shouyilvSumPow / (count($shouyilvMonthArr) - 1)), 6);
         // 夏普比率
         $sharpeRatio = round(($this->expectRatio - $this->bankRatio) / $shouyilvStandardDeviation, 6);
-        dump("【组合预期收益率】");dump($this->expectRatio);
-        dump("【银行同期收益率】");dump($this->bankRatio);
-        dump("【4.标准差或波动率】");dump($shouyilvStandardDeviation);
-        dump("【5.夏普比率】");dump($sharpeRatio);
+        // dump("【组合预期收益率】");dump($this->expectRatio);
+        // dump("【银行同期收益率】");dump($this->bankRatio);
+        // dump("【4.标准差或波动率】");dump($shouyilvStandardDeviation);
+        // dump("【5.夏普比率】");dump($sharpeRatio);
+        View::assign(['shouyie' => json_encode(array_column($this->handleFinalArr, 'shouyie'))]);
+        View::assign(['shouyilv' => json_encode(array_column($this->handleFinalArr, 'shouyilv'))]);
+        View::assign(['forwardMaxHuichelv' => json_encode(array_column($this->handleFinalArr, 'forwardMaxHuichelv'))]);
+        View::assign(['date' => json_encode(array_keys($this->handleFinalArr))]);
+
+        View::assign('StandardDeviation', $shouyilvStandardDeviation);
+        View::assign('sharpeRatio', $sharpeRatio);
+        View::assign('expectRatio', $this->expectRatio);
+        View::assign('bankRatio', $this->bankRatio);
+        return View::fetch();
     }
 }

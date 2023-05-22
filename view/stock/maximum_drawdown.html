@@ -1,0 +1,148 @@
+<!--
+ * @Author: chuiyan xzcxin061@163.com
+ * @Date: 2023-05-22 11:34:04
+ * @LastEditors: chuiyan xzcxin061@163.com
+ * @LastEditTime: 2023-05-22 18:38:02
+ * @FilePath: /woodsmoke/view/stock/maximum_drawdown.html
+ * @Description: 最大回撤率
+ * 
+ * Copyright (c) 2023 by woodsmoke, All Rights Reserved. 
+-->
+{extend name="base" /}
+
+{block name="header"}
+    <script type="text/javascript" src="/static/echarts.js"></script>
+{/block}
+{block name="menu"}{/block}
+{block name="main"}
+    <div>【组合预期收益率】{$expectRatio}【银行同期收益率】{$bankRatio}【标准差或波动率】{$StandardDeviation}【夏普比率】{$sharpeRatio}</div>
+    <!-- 为 ECharts 准备一个定义了宽高的 DOM -->
+    <div id="container" style="width: 100%;height: 600%"></div>
+{/block}
+{block name="footer"}
+    <script type="moudle">
+        import * as echarts from '/static/echarts';
+    </script>
+    <script type="text/javascript">
+        var shouyie = {$shouyie|raw};
+        var shouyilv = {$shouyilv|raw};
+        var forwardMaxHuichelv = {$forwardMaxHuichelv|raw};
+        var date = {$date|raw};
+    </script>
+    <script type="text/javascript">
+        var chartDom = document.getElementById('container');
+        var myChart = echarts.init(chartDom);
+        var option;
+        
+        const colors = ['#5470C6', '#91CC75', '#EE6666'];
+        option = {
+            color: colors,
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross'
+                }
+            },
+            grid: {
+                right: '20%'
+            },
+            toolbox: {
+                feature: {
+                    dataView: { show: true, readOnly: false },
+                    restore: { show: true },
+                    saveAsImage: { show: true }
+                }
+            },
+            legend: {
+                data: ['最大回撤率', '年化收益率', '累计收益额']
+            },
+            xAxis: [
+                {
+                type: 'category',
+                axisTick: {
+                    alignWithLabel: true
+                },
+                // prettier-ignore
+                // data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                data: date
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    name: '比例',
+                    position: 'right',
+                    alignTicks: true,
+                    axisLine: {
+                        show: true,
+                        lineStyle: {
+                            color: colors[0]
+                        }
+                    },
+                    axisLabel: {
+                        formatter: '{value}'
+                    }
+                },
+                // {
+                //     type: 'value',
+                //     name: '年化收益率',
+                //     position: 'right',
+                //     alignTicks: true,
+                //     offset: 80,
+                //     axisLine: {
+                //         show: true,
+                //         lineStyle: {
+                //             color: colors[1]
+                //         }
+                //     },
+                //     axisLabel: {
+                //         formatter: '{value} %'
+                //     }
+                // },
+                {
+                    type: 'value',
+                    name: '累计收益额',
+                    position: 'left',
+                    alignTicks: true,
+                    axisLine: {
+                        show: true,
+                        lineStyle: {
+                            color: colors[2]
+                        }
+                    },
+                    axisLabel: {
+                        formatter: '{value} ￥'
+                    }
+                }
+            ],
+            series: [
+                {
+                    name: '最大回撤率',
+                    type: 'line',
+                    // data: [
+                    //     2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3
+                    // ]
+                    data: forwardMaxHuichelv
+                },
+                {
+                    name: '年化收益率',
+                    type: 'line',
+                    yAxisIndex: 0,
+                    // data: [
+                    //     2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3
+                    // ]
+                    data: shouyilv
+                },
+                {
+                    name: '累计收益额',
+                    type: 'line',
+                    yAxisIndex: 1,
+                    // data: [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
+                    data: shouyie
+                }
+            ]
+        };
+        
+        option && myChart.setOption(option);
+    </script>
+{/block}
