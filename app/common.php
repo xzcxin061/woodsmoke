@@ -3,7 +3,7 @@
  * @Author: chuiyan xzcxin061@163.com
  * @Date: 2022-04-08 16:51:27
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-05-15 17:43:22
+ * @LastEditTime: 2023-05-31 09:22:46
  * @FilePath: /woodsmoke/app/common.php
  * @Description: 
  * 
@@ -35,19 +35,32 @@
 
  /**
   * @author woodsmoke
-  * 功能描述：获取已有日期中每个月的最后一天
-  * @param $array 需要查询的数组
-  * @param $status true|false 完整自然月的日期|当月部分日期
+  * 功能描述：触发买入/卖出的条件
+  * @param $object 需要查询的数组
   * @return array 
   */
-function get_maxdate_by_month($array, $status = false)
+function get_deal_condition($object, $param)
 {
-    // foreach () {
-      
-    // }
-    // if ($status) {
-      
-    // } else {
+    
+    // if(!empty($object)){
+    //     $array = $object->toArray();
+    //     foreach($array as $key => $value){
+    //         // 更新初始价格
+    //         $price = $array[0]['close'];
+    //         if($key == 0){
+    //             $dealArr = [];
+    //         }else{
+                
 
+    //             // 检测是否触发卖出条件
+    //             $array[$key]['high'] - $array[$key]['low'];
+    //             // 检测是否触发买入条件
+
+                
+    //             $buynum = floor($param[0] / ($value['low'] * $param[1] * 2)) * $param[1];
+    //             $dealArr[$value['stockcode']][] = [$value['stockcode'], $value['date'], $buynum, $value['low']];
+    //         }
+    //     }
     // }
+    
 }

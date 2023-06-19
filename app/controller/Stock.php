@@ -3,7 +3,7 @@
  * @Author: chuiyan 
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-05-22 18:35:23
+ * @LastEditTime: 2023-06-19 16:42:10
  * @FilePath: /woodsmoke/app/controller/Stock.php
  * @Description: 
  * 
@@ -45,7 +45,7 @@ class Stock
 
     // 股票数量少，手动处理比较快，写代码查询第一天的收盘价再拼数组也行。
     // 选择投资组合2，数组和字符串二选一
-    protected $stockCodeArr = ['601319', '601688', '600623', '600810', '600475', '600585', '600104', '600997', '000725', '600028', '600398', '600308', '600782', '600000'];  
+    protected $stockCodeArr = ['601319', '601688', '600623', '600810', '600475', '600585', '600104', '600997', '000725', '600028', '600398', '600308', '600782', '600000'];
     protected $stockCodeStr = '601319,601688,600623,600810,600475,600585,600104,600997,000725,600028,600398,600308,600782,600000';
     protected $startTime = '220602';
     protected $stopTime = '230505';
@@ -75,13 +75,17 @@ class Stock
     protected $resultArr = []; // 投资组合处理过渡数组
     protected $finalArr = []; // 投资组合处理过渡数组
     protected $handleFinalArr = []; // 投资组合处理过渡数组
-
+    // 加减仓参数设置
     protected $singlePrice = 30000;
     protected $unitGroup = 100;
+    protected $additionMultiple = 0.5; // 加仓倍数，加仓金额 = $singlePrice * $additionMultiple
+    // 涨跌幅度设置
+    protected $grow = '0.400000';
+    protected $down = '-0.250000';
     // 设置组合预期收益率
-    protected $expectRatio = 0.034300;
+    protected $expectRatio = 0.0343;
     // 设置银行同期利率
-    protected $bankRatio = 0.030000;    
+    protected $bankRatio = 0.0300;
     /**
      * @Func 股票投资组合最大回撤率：在选定周期内任一历史时点往后推，产品净值走到最低点时的收益率回撤幅度的最大值。
      * @Describe 导出图表和数据，也可能会拆分该函数
@@ -91,6 +95,12 @@ class Stock
      */
     public function maximumDrawdown ()
     {
+        $rangeArr = [$this->startTime, $this->stopTime];
+        $paramArr = [$this->singlePrice, $this->unitGroup, $this->grow, $this->down, $this->additionMultiple];
+        // 买入卖出记录
+        $stockDealArr = invoke(['app\extend\StockDeal', 'deal'], [$this->stockCodeArr, $rangeArr, $paramArr]);
+
+
         // 初始化买入数组，投资组合不会为空
         $orignObj = Daily::withSearch(['stockcode','date', 'close'], ['stockcode'=>$this->stockCodeStr, 'date' => $this->startTime])
                         ->field('date, stockcode, close') 
@@ -108,32 +118,36 @@ class Stock
         // $resultArr数组赋值
         if (!$dataObj->isEmpty()) {
             // 先不考虑添加原始投资组合之外的股票stockcode
-            foreach ($dataObj as &$val) {
+            foreach ($dataObj as $val) {
                 // x轴：时间
                 $this->resultArr[$val->stockcode]['x'][$val->date] = $val->date;
                 // y轴：收盘价
                 $this->resultArr[$val->stockcode]['y'][$val->date] = $val->close;
                 // 计算每天的持有股数,默认等于初始买入股数
                 $this->resultArr[$val->stockcode]['shares'][$val->date] = $this->handleBuyArr[$val->stockcode][2];
-                // 处理买入数据，每天
-                if (!empty(array_filter($this->buyArr)) && !empty($this->buyArr[$val->stockcode])) {
-                    foreach ($this->buyArr[$val->stockcode] as $k => $v) {
-                        if ($v[1] <= $val->date) {
-                            $this->resultArr[$val->stockcode]['shares'][$val->date] += $v[2];
-                        } else {
-                            $this->resultArr[$val->stockcode]['shares'][$val->date] += 0;
-                        }
-                    }
-                }
-                // 处理卖出数据，每天
-                if (!empty(array_filter($this->saleArr)) && !empty($this->saleArr[$val->stockcode])) {
-                    foreach ($this->saleArr[$val->stockcode] as $k => $v) {
-                        if ($v[1] <= $val->date) {
-                            $this->resultArr[$val->stockcode]['shares'][$val->date] += $v[2];
-                        } else {
-                            $this->resultArr[$val->stockcode]['shares'][$val->date] += 0;
-                        }
-                    }
+                // // 处理买入数据，每天
+                // if (!empty(array_filter($this->buyArr)) && !empty($this->buyArr[$val->stockcode])) {
+                //     foreach ($this->buyArr[$val->stockcode] as $k => $v) {
+                //         if ($v[1] <= $val->date) {
+                //             $this->resultArr[$val->stockcode]['shares'][$val->date] += $v[2];
+                //         } else {
+                //             $this->resultArr[$val->stockcode]['shares'][$val->date] += 0;
+                //         }
+                //     }
+                // }
+                // // 处理卖出数据，每天
+                // if (!empty(array_filter($this->saleArr)) && !empty($this->saleArr[$val->stockcode])) {
+                //     foreach ($this->saleArr[$val->stockcode] as $k => $v) {
+                //         if ($v[1] <= $val->date) {
+                //             $this->resultArr[$val->stockcode]['shares'][$val->date] += $v[2];
+                //         } else {
+                //             $this->resultArr[$val->stockcode]['shares'][$val->date] += 0;
+                //         }
+                //     }
+                // }
+                // 处理买入卖出数据
+                if(!empty(array_filter($stockDealArr[0])) && !empty($stockDealArr[0][$val->stockcode])){
+                    $this->resultArr[$val->stockcode]['shares'][$val->date] = $stockDealArr[1][$val->stockcode]['updateNum'];
                 }
             }
         }
@@ -154,41 +168,43 @@ class Stock
                     // 收盘额，按每天持有股数统计。
                     $value['shoupane'][$v] = $value['shares'][$v] * $value['y'][$v];
                     // 计算均价,需要判断股票code存在
-                    // 处理买入数据，每天
-                    if (!empty(array_filter($this->buyArr)) && !empty($this->buyArr[$key])) {
-                        foreach ($this->buyArr[$key] as $val) {
-                            if ($val[1] <= $v) {
-                                $this->resultArr[$key]['junjia'][$v] = round(
-                                    ($originPriceAverage * $this->buyArr[$key][2] + $val[3] * $val[2]) // 持有价值
-                                    / 
-                                    $value['shares'][$v] // 持有股数
-                                    , 2
-                                );
-                            }
-                        }
-                    }
-                    // 处理卖出数据，每天
-                    if (!empty(array_filter($this->saleArr)) && !empty($this->saleArr[$key])) {
-                        foreach ($this->saleArr[$key] as $val) {
-                            if ($val[1] <= $v) {
-                                $this->resultArr[$key]['junjia'][$v] = round(
-                                        ($this->resultArr[$key]['junjia'][$v] * $value['junjia'][$v] + $val[3] * $val[2]) // 持有价值
-                                        / 
-                                        ($value['junjia'][$v] + $val[2]) // 持有股数
-                                    , 2
-                                );
-                            }
-                        }
-                    }
+                    // // 处理买入数据，每天
+                    // if (!empty(array_filter($this->buyArr)) && !empty($this->buyArr[$key])) {
+                    //     foreach ($this->buyArr[$key] as $val) {
+                    //         if ($val[1] <= $v) {
+                    //             $this->resultArr[$key]['junjia'][$v] = round(
+                    //                 ($originPriceAverage * $this->buyArr[$key][2] + $val[3] * $val[2]) // 持有价值
+                    //                 / 
+                    //                 $value['shares'][$v] // 持有股数
+                    //                 , 2
+                    //             );
+                    //         }
+                    //     }
+                    // }
+                    // // 处理卖出数据，每天
+                    // if (!empty(array_filter($this->saleArr)) && !empty($this->saleArr[$key])) {
+                    //     foreach ($this->saleArr[$key] as $val) {
+                    //         if ($val[1] <= $v) {
+                    //             $this->resultArr[$key]['junjia'][$v] = round(
+                    //                     ($this->resultArr[$key]['junjia'][$v] * $value['junjia'][$v] + $val[3] * $val[2]) // 持有价值
+                    //                     / 
+                    //                     ($value['junjia'][$v] + $val[2]) // 持有股数
+                    //                 , 2
+                    //             );
+                    //         }
+                    //     }
+                    // }
 
+                    if (!empty(array_filter($stockDealArr[0])) && !empty($stockDealArr[0][$key])) {
+                        $this->resultArr[$key]['junjia'][$v] = $stockDealArr[1][$key]['updatePrice'];
+                    }
                 }
                 $this->resultArr[$key] = $value;
             }
         }
 
         // 分析思路
-        // 
-        if (!empty(array_filter($this->resultArr))) {         
+        if (!empty(array_filter($this->resultArr))) {
             foreach ($this->resultArr as $key => &$value) {
                 $yingkuieInner = 0.00;
                 foreach ($value['x'] as $k => $v) {
@@ -238,7 +254,7 @@ class Stock
                     $shouyilv = round($shouyie / $orginAmount, 4);
                 }
                 $this->handleFinalArr[$key]['shouyilv'] = $shouyilv;
-                $this->handleFinalArr[$key]['shouyie'] = $shouyie;
+                $this->handleFinalArr[$key]['shouyie'] = round($shouyie,2);
                 $this->handleFinalArr[$key]['orginAmount'] = $orginAmount;
                 $this->handleFinalArr[$key]['shoupane'] = $shoupane;
             }
@@ -250,7 +266,7 @@ class Stock
             $keysArr = array_keys($this->handleFinalArr);
             $keysReverseArr = array_flip($keysArr);
             foreach ($this->handleFinalArr as $key => &$value) {
-                // 投资时间固定的最大回车率
+                // 投资时间固定的最大回撤率
                 $forwardChilrenArr = array_slice(array_column($this->handleFinalArr, 'shouyie'), 0, $keysReverseArr[$key] + 1, true);
                 $forwardMinShouyie = min($forwardChilrenArr);
                 $forwardMaxShouyie = max($forwardChilrenArr);
@@ -390,6 +406,11 @@ class Stock
         View::assign('sharpeRatio', $sharpeRatio);
         View::assign('expectRatio', $this->expectRatio);
         View::assign('bankRatio', $this->bankRatio);
+        View::assign('stockCodeStr', $this->stockCodeStr);
+        View::assign('startTime', '20'.$this->startTime);
+        View::assign('stopTime', '20'.$this->stopTime);
+        View::assign('grow', $this->grow);
+        View::assign('down', $this->down);
         return View::fetch();
     }
 }
