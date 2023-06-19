@@ -3,7 +3,7 @@
  * @Author: chuiyan 
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-06-19 16:42:10
+ * @LastEditTime: 2023-06-19 17:09:38
  * @FilePath: /woodsmoke/app/controller/Stock.php
  * @Description: 
  * 
@@ -80,8 +80,8 @@ class Stock
     protected $unitGroup = 100;
     protected $additionMultiple = 0.5; // 加仓倍数，加仓金额 = $singlePrice * $additionMultiple
     // 涨跌幅度设置
-    protected $grow = '0.400000';
-    protected $down = '-0.250000';
+    protected $grow = '1.000000';
+    protected $down = '-0.150000';
     // 设置组合预期收益率
     protected $expectRatio = 0.0343;
     // 设置银行同期利率
@@ -146,7 +146,7 @@ class Stock
                 //     }
                 // }
                 // 处理买入卖出数据
-                if(!empty(array_filter($stockDealArr[0])) && !empty($stockDealArr[0][$val->stockcode])){
+                if(!empty(array_filter($stockDealArr[1])) && !empty($stockDealArr[1][$val->stockcode])){
                     $this->resultArr[$val->stockcode]['shares'][$val->date] = $stockDealArr[1][$val->stockcode]['updateNum'];
                 }
             }
@@ -195,7 +195,7 @@ class Stock
                     //     }
                     // }
 
-                    if (!empty(array_filter($stockDealArr[0])) && !empty($stockDealArr[0][$key])) {
+                    if (!empty(array_filter($stockDealArr[1])) && !empty($stockDealArr[1][$key])) {
                         $this->resultArr[$key]['junjia'][$v] = $stockDealArr[1][$key]['updatePrice'];
                     }
                 }
