@@ -3,7 +3,7 @@
  * @Author: chuiyan 
  * @Date: 2022-05-23 15:29:06
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-06-19 17:09:38
+ * @LastEditTime: 2023-06-20 10:30:28
  * @FilePath: /woodsmoke/app/controller/Stock.php
  * @Description: 
  * 
@@ -341,7 +341,7 @@ class Stock
                 $latestDayObj->toArray()
             );
         } else {
-            // 经过动态获取器处理
+            // toArray()会自动触发$latestDayObj中的动态获取器withAttr
             $latestDayArr = $latestDayObj->toArray();
         }
         // -----------------------写法1结束-------------------------------------
@@ -356,7 +356,7 @@ class Stock
         // if ($this->startTime != $this->stopTime) {
         //     $latestDayArr = array_merge(array(array('date' => '20'.$this->startTime)), $latestDayObj->toArray());
         // } else {
-        //     // 经过获取器处理
+        //     // toArray()会自动触发模型Daily中的获取器getDateAttr()
         //     $latestDayArr = $latestDayObj->toArray();
         // }
         // -----------------------写法2结束-------------------------------------
