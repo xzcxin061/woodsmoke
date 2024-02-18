@@ -227,3 +227,5 @@ Route::rule('otore', 'Mydoc/oneToOneRelation', 'get');
 Route::rule('otmre', 'Mydoc/oneToManyRelation', 'get');
 
 Route::rule('drawdown', 'Stock/maximumDrawdown', 'get');
+
+Route::rule('profile', 'Index/get_profile', 'get');

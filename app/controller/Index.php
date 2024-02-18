@@ -13,6 +13,7 @@ use app\controller\TrendLine;
 use think\facade\Route;
 use app\model\User;
 use think\Container;
+use think\db\Query;
 use think\facade\Event;
 
 class Index extends BaseController
@@ -240,5 +241,51 @@ class Index extends BaseController
         $getRegion = "https://api.map.baidu.com/place/v2/search?query=ATM机&tag=银行&region=北京&output=json&ak=qjZIqKemNWV2jL1Uqu5W2oOSmKjLzhMs"; //GET请求
 
         // http://lbsyun.baidu.com/apiconsole/qjZIqKemNWV2jL1Uqu5W2oOSmKjLzhMs
+    }
+
+    /**
+     * 测试模型关联:一对一关联
+     */
+    public function get_profile()
+    {
+        // 注意对象不能为空，应该做判断
+        $user = User::find(2);
+        // 注意：User和userProfile的属性调用方式有点区别
+        $a = $user->user_profile->realname; // userProfile的
+        print_r($a);echo "<br/>";
+        $h = $user->username; // User的
+        print_r($h);echo "<br/>";
+        // hasWhere查询，存在N+1问题
+        $b = User::hasWhere('userProfile', ['createtime' => '1355388797'])->select();
+        foreach($b as $v){
+            echo "hasWhere:";echo $v->userProfile->realname;echo "<br/>";
+        }
+        // with使用的是in查询，避免N+1问题
+        $c = User::with('userProfile')->select();
+        foreach($c as $v){
+            echo "with:";echo $v->userProfile->realname;echo "<br/>";
+        }
+        // hasWhere是关联查询，但where是普通条件查询可以和with配合使用
+        $d = User::with(['userProfile' => function(Query $query){
+            // 有的讨论说使用where要加上getQuery方法，待验证，https://www.cnblogs.com/dengxiaobo/p/16173313.html
+            $query->field('user_id, realname')->where('sex', '=', 1);
+        }])->where('status', '>', 1)->select();
+        echo User::getLastSql();echo "<br/>";
+        
+        foreach($d as $v){
+            if($v->userProfile){
+                echo "匿名函数：";echo $v->userProfile->realname;echo "<br/>";
+            }else{
+                echo "匿名函数：";var_dump($v->userProfile);echo "<br/>";
+            }
+            
+        }
+    }
+    /**
+     * withJoin测试
+     */
+    public function get_article()
+    {
+
     }
 }

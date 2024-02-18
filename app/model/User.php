@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-06-30 11:58:45
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2023-04-25 16:17:48
+ * @LastEditTime: 2023-12-06 17:58:10
  * @FilePath: /woodsmoke/app/model/User.php
  * @Description: 
  * 
@@ -64,5 +64,10 @@ class User extends Model
         // 一对一是一对多的特殊情况，只能定义一个，使用一对多就行了。
         return $this->hasMany(Article::class, 'user_id', 'id');
 
+    }
+
+    public function userProfile()
+    {
+        return $this->hasOne(UserProfile::class);
     }
 }
