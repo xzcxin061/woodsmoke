@@ -12,6 +12,7 @@ use app\extend\Cont;
 use app\controller\TrendLine;
 use think\facade\Route;
 use app\model\User;
+use app\model\UserProfile;
 use think\Container;
 use think\db\Query;
 use think\facade\Event;
@@ -286,6 +287,31 @@ class Index extends BaseController
      */
     public function get_article()
     {
+        // 默认使用INNER JOIN连接
+        $a_test = User::withJoin('article')->limit(5)->select();
+        // 手动指定使用left join连接
+        $b_test = User::withJoin('article', 'left')->limit(5)->select();
+        // 使用多个join
+        $c_test = User::withJoin(['article', 'userProfile'], 'left')->limit(5)->select();
+        
+        // 关联保存，使用了mysql的replace into tbl_name set col_name=value, ...语句
+        /**
+         * 1.根据主键或唯一索引判断记录是否已存在，所以插入数据的表必须要有主键或者唯一索引(备注：索引可以是多个字段同时创建的)！否则的话，REPLACE INTO 会直接插入数据（相当于INSERT），会导致表中出现重复数据。
+         * 2.如果不写某个字段的值则会使用默认值，如果该字段没有定义默认值则报错。
+         * 3.要使用REPLACE INTO，必须同时拥有表的INSERT和 DELETE权限。
+         */
+        $a_save = User::find(3);
+        // 根据索引匹配到数据则删除原数据并新增一条，匹配不到数据则直接新增一条
+        $a_save->userProfile()->save(['realname' => '李四', 'sex'=>2, 'email'=>'lisi2022@hotmail.com', 'img'=>'https://img.100run.com/201212/50ca9afd94e6c.jpg', 'login_count'=>'1215', 'address' => '天津市河北区']);
+        echo User::getLastSql();echo "<br/>";
+        var_dump($a_save->userProfile()); // 返回hasOne对象
+        echo "<br/>";echo "<br/>";echo "<br/>";echo "<br/>";echo "<br/>";
+        var_dump($a_save->userProfile); // 返回userProfile对象
+    }
 
+    public function get_user()
+    {
+        $user_profile = UserProfile::find(3);
+        echo $user_profile->user->id;
     }
 }
