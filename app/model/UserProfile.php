@@ -3,7 +3,7 @@
  * @Author: chuiyan xzcxin061@163.com
  * @Date: 2023-04-13 11:19:17
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2024-03-06 16:27:36
+ * @LastEditTime: 2024-03-08 17:51:42
  * @FilePath: /woodsmoke/app/model/UserProfile.php
  * @Description: 一对一关联
  * 
@@ -35,6 +35,17 @@ class UserProfile extends Model
     {
         // 表字段符合系统命名规则的时候，第二个和第三个参数不用传
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * 关联查询支持获取器，绑定到父模型的字段也支持
+     * 这是获取器在子模型中设置的例子
+     * 父模型中设置的例子见getAddressAttr
+     */
+    public function getEmailAttr($value, $data)
+    {
+        $value = $value.".cn";
+        return $value;
     }
     
 }

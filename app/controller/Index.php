@@ -253,18 +253,20 @@ class Index extends BaseController
         $user = User::find(2);
         // 注意：User和userProfile的属性调用方式有点区别
         $a = $user->user_profile->realname; // userProfile的
+        // 使用下面的语句也一样，区别就是user_profile和userProfile，关联属性系统会自动转换（驼峰转下划线）
+        // $a = $user->userProfile->realname;
         print_r($a);echo "<br/>";
         $h = $user->username; // User的
         print_r($h);echo "<br/>";
         // hasWhere查询，存在N+1问题
         $b = User::hasWhere('userProfile', ['createtime' => '1355388797'])->select();
         foreach($b as $v){
-            echo "hasWhere:";echo $v->userProfile->realname;echo "<br/>";
+            echo "hasWhere:";echo $v->user_profile->realname;echo "<br/>";
         }
         // with使用的是in查询，避免N+1问题
         $c = User::with('userProfile')->select();
         foreach($c as $v){
-            echo "with:";echo $v->userProfile->realname;echo "<br/>";
+            echo "with:";echo $v->user_profile->realname;echo "<br/>";
         }
         // hasWhere是关联查询，但where是普通条件查询可以和with配合使用
         $d = User::with(['userProfile' => function(Query $query){
@@ -274,10 +276,10 @@ class Index extends BaseController
         echo User::getLastSql();echo "<br/>";
         
         foreach($d as $v){
-            if($v->userProfile){
-                echo "匿名函数：";echo $v->userProfile->realname;echo "<br/>";
+            if($v->user_profile){
+                echo "匿名函数：";echo $v->user_profile->realname;echo "<br/>";
             }else{
-                echo "匿名函数：";var_dump($v->userProfile);echo "<br/>";
+                echo "匿名函数：";var_dump($v->user_profile);echo "<br/>";
             }
             
         }
@@ -300,18 +302,44 @@ class Index extends BaseController
          * 2.如果不写某个字段的值则会使用默认值，如果该字段没有定义默认值则报错。
          * 3.要使用REPLACE INTO，必须同时拥有表的INSERT和 DELETE权限。
          */
+        // 关联保存新增数据的方法，实现原理mysql的REPLACE INTO
         $a_save = User::find(3);
-        // 根据索引匹配到数据则删除原数据并新增一条，匹配不到数据则直接新增一条
         $a_save->userProfile()->save(['realname' => '李四', 'sex'=>2, 'email'=>'lisi2022@hotmail.com', 'img'=>'https://img.100run.com/201212/50ca9afd94e6c.jpg', 'login_count'=>'1215', 'address' => '天津市河北区']);
         echo User::getLastSql();echo "<br/>";
-        var_dump($a_save->userProfile()); // 返回hasOne对象
-        echo "<br/>";echo "<br/>";echo "<br/>";echo "<br/>";echo "<br/>";
-        var_dump($a_save->userProfile); // 返回userProfile对象
+
+        // 关联保存更新数据的方法
+        $b_save = User::find(3);
+        $b_save->user_profile->save(['address' => '天津市和平区']);
+        // 或者
+        // $b_save->userProfile->address = "天津市和平区";
+        // $b_save->userProfile->save();
+        echo User::getLastSql();echo "<br/>";
+        // var_dump($a_save->userProfile()); // 返回hasOne对象
+        // echo "<br/>";echo "<br/>";echo "<br/>";echo "<br/>";echo "<br/>";
+        // var_dump($a_save->userProfile); // 返回userProfile对象
     }
 
+    /**
+     * 相对关联
+     */
     public function get_user()
     {
         $user_profile = UserProfile::find(3);
         echo $user_profile->user->id;
+    }
+
+    /**
+     * 绑定属性到父模型
+     */
+    public function get_bind_profit()
+    {
+        // 使用预载入查询的情况
+        $user = User::with('user_profile')->find(4);
+        print_r($user->address);echo "<br/>";
+        print_r($user->email);echo "<br/>";
+        // 不使用预载入查询的情况
+        $user = User::find(5);
+        $user->appendRelationAttr('userProfile', ['img']);echo "<br/>";
+        var_dump($user->img);echo "<br/>";
     }
 }

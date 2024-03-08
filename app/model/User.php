@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-06-30 11:58:45
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2024-02-22 16:52:31
+ * @LastEditTime: 2024-03-08 18:35:01
  * @FilePath: /woodsmoke/app/model/User.php
  * @Description: 
  * 
@@ -68,6 +68,17 @@ class User extends Model
 
     public function userProfile()
     {
-        return $this->hasOne(UserProfile::class);
+        return $this->hasOne(UserProfile::class)->bind(['realname', 'email', 'address']);
+    }
+
+    /**
+     * 关联查询支持获取器，绑定到父模型的字段也支持
+     * 这是获取器在父模型中设置的例子
+     * 子模型中设置的例子见getEmailAttr
+     */
+    public function getAddressAttr($value, $data)
+    {
+        $value = "中国".$value;
+        return $value;
     }
 }

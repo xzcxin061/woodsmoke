@@ -233,3 +233,5 @@ Route::rule('profile', 'Index/get_profile', 'get');
 Route::rule('article', 'Index/get_article', 'get');
 
 Route::rule('users', 'Index/get_user', 'get');
+
+Route::rule('bindpro', 'Index/get_bind_profit', 'get');
