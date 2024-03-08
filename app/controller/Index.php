@@ -311,8 +311,8 @@ class Index extends BaseController
         $b_save = User::find(3);
         $b_save->user_profile->save(['address' => '天津市和平区']);
         // 或者
-        // $b_save->userProfile->address = "天津市和平区";
-        // $b_save->userProfile->save();
+        // $b_save->user_profile->address = "天津市和平区";
+        // $b_save->user_profile->save();
         echo User::getLastSql();echo "<br/>";
         // var_dump($a_save->userProfile()); // 返回hasOne对象
         // echo "<br/>";echo "<br/>";echo "<br/>";echo "<br/>";echo "<br/>";
