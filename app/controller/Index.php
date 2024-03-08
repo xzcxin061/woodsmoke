@@ -316,7 +316,7 @@ class Index extends BaseController
         echo User::getLastSql();echo "<br/>";
         // var_dump($a_save->userProfile()); // 返回hasOne对象
         // echo "<br/>";echo "<br/>";echo "<br/>";echo "<br/>";echo "<br/>";
-        // var_dump($a_save->userProfile); // 返回userProfile对象
+        // var_dump($a_save->user_profile); // 返回userProfile对象
     }
 
     /**
