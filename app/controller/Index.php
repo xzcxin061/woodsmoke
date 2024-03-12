@@ -13,6 +13,8 @@ use app\controller\TrendLine;
 use think\facade\Route;
 use app\model\User;
 use app\model\UserProfile;
+use app\model\Blog;
+use app\model\Content;
 use think\Container;
 use think\db\Query;
 use think\facade\Event;
@@ -304,7 +306,7 @@ class Index extends BaseController
          */
         // 关联保存新增数据的方法，实现原理mysql的REPLACE INTO
         $a_save = User::find(3);
-        $a_save->userProfile()->save(['realname' => '李四', 'sex'=>2, 'email'=>'lisi2022@hotmail.com', 'img'=>'https://img.100run.com/201212/50ca9afd94e6c.jpg', 'login_count'=>'1215', 'address' => '天津市河北区']);
+        $a_save->userProfile()->save(['realname' => '李四', 'sex'=>2, 'email'=>'lisi2022@hotmail.com', 'img'=>'https://img.100run.com/201212/50ca9afd94e6c.jpg', 'login_count'=>'1215', 'createtime'=>'1355388797', 'logintime'=>'1355388797', 'address' => '天津市河北区']);
         echo User::getLastSql();echo "<br/>";
 
         // 关联保存更新数据的方法
@@ -334,12 +336,38 @@ class Index extends BaseController
     public function get_bind_profit()
     {
         // 使用预载入查询的情况
-        $user = User::with('user_profile')->find(4);
+        $user = User::with('userProfile')->find(4);
         print_r($user->address);echo "<br/>";
         print_r($user->email);echo "<br/>";
+        // bindAttr动态绑定(也必须使用with预载入)
+        $user = User::with('userProfile')->find(2)->bindAttr('userProfile', ['logins'=>'login_count']);
+        var_dump($user->logins);echo "<br/>";
+
         // 不使用预载入查询的情况
         $user = User::find(5);
         $user->appendRelationAttr('userProfile', ['img']);echo "<br/>";
         var_dump($user->img);echo "<br/>";
+
+    }
+
+    /**
+     * 关联自动写入
+     */
+    public function auto_relation_save()
+    {
+        // 写入
+        $blog = new Blog;
+        $blog->content_id = 1;
+        $blog->title = "第一条数据的开始，";
+        $blog->num = 10;
+
+        $content = new Content;
+        $content->blog_id = 1;
+        $content->content = "第一条数据的结束";
+
+        $blog->content = $content;
+        $blog->together(['content'])->save(); 
+        // 更新
+
     }
 }
