@@ -355,19 +355,26 @@ class Index extends BaseController
      */
     public function auto_relation_save()
     {
-        // 写入
-        $blog = new Blog;
-        $blog->content_id = 1;
-        $blog->title = "第一条数据的开始，";
-        $blog->num = 10;
+        // 官方文档写入有问题,暂时不知道原因
+        // $vblog = new Blog;
+        // $vblog->blog_id = 2;
+        // $vblog->title = "第2条数据的开始，";
+        // $vblog->num = 10;
 
-        $content = new Content;
-        $content->blog_id = 1;
-        $content->content = "第一条数据的结束";
+        // $vcontent = new Content;
+        // $vcontent->blog_id = 2;
+        // $vcontent->content = "第2条数据的结束";
+        // $vblog->content = $vcontent;
+        // $vblog->together(['content'])->save();
 
-        $blog->content = $content;
-        $blog->together(['content'])->save(); 
         // 更新
+        $blog = Blog::find(1);
+        $blog->title = '更改标题:第1条数据的开始，';
+        $blog->content->content = '更新内容:第1条数据的结束';
+        $blog->together(['content'])->save();
 
+        // 删除当前及关联模型
+        $blog = Blog::with('content')->find(1);
+        $blog->together(['content'])->delete();
     }
 }
