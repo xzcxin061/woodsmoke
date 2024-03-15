@@ -355,17 +355,18 @@ class Index extends BaseController
      */
     public function auto_relation_save()
     {
-        // 官方文档写入有问题,暂时不知道原因
-        // $vblog = new Blog;
-        // $vblog->blog_id = 2;
-        // $vblog->title = "第2条数据的开始，";
-        // $vblog->num = 10;
+        // 官方文档写入有bug,是系统一个json字符串转换的问题
+        // 
+        $vblog = new Blog;
+        $vblog->blog_id = 2;
+        $vblog->title = "第2条数据的开始，";
+        $vblog->num = 10;
 
-        // $vcontent = new Content;
-        // $vcontent->blog_id = 2;
-        // $vcontent->content = "第2条数据的结束";
-        // $vblog->content = $vcontent;
-        // $vblog->together(['content'])->save();
+        $vcontent = new Content;
+        $vcontent->blog_id = 2;
+        $vcontent->content = "第2条数据的结束";
+        $vblog->content = $vcontent;
+        $vblog->together(['content'])->save();
 
         // 更新
         $blog = Blog::find(1);
@@ -376,5 +377,13 @@ class Index extends BaseController
         // 删除当前及关联模型
         $blog = Blog::with('content')->find(1);
         $blog->together(['content'])->delete();
+    }
+
+    /**
+     * 一对多关联
+     */
+    public function get_comments()
+    {
+
     }
 }

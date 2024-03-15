@@ -237,3 +237,5 @@ Route::rule('users', 'Index/get_user', 'get');
 Route::rule('bindpro', 'Index/get_bind_profit', 'get');
 
 Route::rule('rsave', 'Index/auto_relation_save', 'get');
+
+Route::rule('comments', 'Index/get_comments', 'get');
