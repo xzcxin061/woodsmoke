@@ -359,24 +359,39 @@ class Index extends BaseController
         // 官方文档写入有bug,是系统一个json字符串没能转换成数组的问题,临时将OneToOne.php的save方法，添加了判断，
         // if(is_string($data)){$data = json_decode($data, true);}
         // 貌似together新增数据只支持replace into，不支持insert into
-        // 下面3部分分开执行,mysql的content表里没有设置unique索引字段,所以第一部分执行会重复插入.
         // 要想执行效果好，mysql先TRUNCATE TABLE blog和TRUNCATE TABLE content
+        // 下面4部分分开执行,mysql的content表里没有设置unique索引字段,所以第一部分执行会重复插入.
+
+        // ---------第1部分------------------------------------------------------
         $vblog = new Blog;
         $vblog->blog_id = 1;
-        $vblog->title = "第1条数据的开始，";
+        $vblog->title = "第11条数据的开始，";
         $vblog->num = 10;
         $vcontent = new Content;
         $vcontent->blog_id = 1;
-        $vcontent->content = "第1条数据的结束";
+        $vcontent->contents = "第11条数据的结束";
         $vblog->content = $vcontent;
         $vblog->together(['content'])->save();
 
+        // ---------第2部分------------------------------------------------------
+        // 绑定了子模型到当前模型
+        $vblog = new Blog;
+        $vblog->title = "第12条数据的开始，";
+        $vblog->num = 12;
+        // 从这开始是子属性
+        $vblog->blog_id = 2;
+        $vblog->contents = "第12条数据的结束";
+
+        $vblog->together(['content'=>['blog_id', 'contents']])->save();
+
+        // ---------第3部分------------------------------------------------------
         // 更新
         $blog = Blog::find($vblog->id);
-        $blog->title = '更改标题:第1条数据的开始，';
-        $blog->content->content = '更新内容:第1条数据的结束';
+        $blog->title = '更改标题:第11条数据的开始，';
+        $blog->content->content = '更新内容:第11条数据的结束';
         $blog->together(['content'])->save();
 
+        // ---------第4部分------------------------------------------------------
         // 删除当前及关联模型
         $blog = Blog::with('content')->find($vblog->id);
         $blog->together(['content'])->delete();

@@ -3,7 +3,7 @@
  * @Author: chuiyan xzcxin061@163.com
  * @Date: 2024-03-12 14:46:44
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2024-03-13 10:24:13
+ * @LastEditTime: 2024-03-21 14:37:25
  * @FilePath: /woodsmoke/app/model/Blog.php
  * @Description: 
  * 
@@ -19,6 +19,6 @@ class Blog extends Model
     // 写点什么...
     public function content()
     {
-        return $this->hasOne(Content::class);
+        return $this->hasOne(Content::class)->bind(['blog_id', 'contents']);
     }
 }
