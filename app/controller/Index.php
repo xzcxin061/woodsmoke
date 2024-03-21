@@ -305,8 +305,9 @@ class Index extends BaseController
          * 3.要使用REPLACE INTO，必须同时拥有表的INSERT和 DELETE权限。
          */
         // 关联保存新增数据的方法，实现原理mysql的REPLACE INTO
+        // 通过save()的第2个参数设置是否自动识别更新和写入，默认true执行REPLACE INTO，设置为false将执行insert into（注意如果索引设置了save_unique_index，索引字段只能插入唯一值）
         $a_save = User::find(3);
-        $a_save->userProfile()->save(['realname' => '李四', 'sex'=>2, 'email'=>'lisi2022@hotmail.com', 'img'=>'https://img.100run.com/201212/50ca9afd94e6c.jpg', 'login_count'=>'1215', 'createtime'=>'1355388797', 'logintime'=>'1355388797', 'address' => '天津市河北区']);
+        $a_save->userProfile()->save(['realname' => '李四', 'sex'=>2, 'email'=>'lisi2022@hotmail.com', 'img'=>'https://img.100run.com/201212/50ca9afd94e6c.jpg', 'login_count'=>'1215', 'createtime'=>'1355388797', 'logintime'=>'1355388797', 'address' => '天津市河北区'], true);
         echo User::getLastSql();echo "<br/>";
 
         // 关联保存更新数据的方法
@@ -355,7 +356,9 @@ class Index extends BaseController
      */
     public function auto_relation_save()
     {
-        // 官方文档写入有bug,是系统一个json字符串转换数组的问题,临时将OneToOne.php的save方法，添加了判断，if(is_string($data)){$data = json_decode($data, true);}
+        // 官方文档写入有bug,是系统一个json字符串没能转换成数组的问题,临时将OneToOne.php的save方法，添加了判断，
+        // if(is_string($data)){$data = json_decode($data, true);}
+        // 貌似together新增数据只支持replace into，不支持insert into
         // 下面3部分分开执行,mysql的content表里没有设置unique索引字段,所以第一部分执行会重复插入.
         // 要想执行效果好，mysql先TRUNCATE TABLE blog和TRUNCATE TABLE content
         $vblog = new Blog;
@@ -384,6 +387,12 @@ class Index extends BaseController
      */
     public function get_comments()
     {
-
+        $user = User::find(4);
+        // 获取该用户的所有文章
+        dump($user->article);echo "<br/>";
+        $title_arr = $user->article()->limit(10)->select();
+        foreach($title_arr as $key=>$val){
+            echo $val->title;echo "<br/>";
+        }
     }
 }

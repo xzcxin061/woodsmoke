@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-06-30 11:58:45
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2024-03-12 14:38:53
+ * @LastEditTime: 2024-03-20 17:00:16
  * @FilePath: /woodsmoke/app/model/User.php
  * @Description: 
  * 
@@ -49,7 +49,7 @@ class User extends Model
     }
 
     /**
-     * 模型关联
+     * 模型一对多关联
      */
     public function article()
     {
@@ -62,12 +62,17 @@ class User extends Model
         // 主键：当前模型主键，默认会自动获取也可以指定传入
 
         // 两个模型之间因为参照模型的不同就会产生相对的但不一定相同的关联关系，并且相对的关联关系只有在需要调用的时候才需要定义
-        return $this->hasOne(Article::class, 'user_id', 'id');
+        // return $this->hasOne(Article::class, 'user_id', 'id');
         // 一对一是一对多的特殊情况，只能定义一个，使用一对多就行了。
-        return $this->hasMany(Article::class, 'user_id', 'id');
+        // return $this->hasMany(Article::class, 'user_id', 'id');
+        return $this->hasMany(Article::class);
 
     }
 
+    /**
+     * 模型一对一关联
+     * bind绑定字段到父模型
+     */
     public function userProfile()
     {
         return $this->hasOne(UserProfile::class)->bind(['realname', 'email', 'address']);
