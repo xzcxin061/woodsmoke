@@ -305,7 +305,8 @@ class Index extends BaseController
          * 3.要使用REPLACE INTO，必须同时拥有表的INSERT和 DELETE权限。
          */
         // 关联保存新增数据的方法，实现原理mysql的REPLACE INTO
-        // 通过save()的第2个参数设置是否自动识别更新和写入，默认true执行REPLACE INTO，设置为false将执行insert into（注意如果索引设置了save_unique_index，索引字段只能插入唯一值）
+        // 通过save()的第2个参数设置是否自动识别更新和写入，默认true执行REPLACE INTO，设置为false将执行insert into
+        // 注意如果索引设置了save_unique_index，索引字段只能插入唯一值
         $a_save = User::find(3);
         $a_save->userProfile()->save(['realname' => '李四', 'sex'=>2, 'email'=>'lisi2022@hotmail.com', 'img'=>'https://img.100run.com/201212/50ca9afd94e6c.jpg', 'login_count'=>'1215', 'createtime'=>'1355388797', 'logintime'=>'1355388797', 'address' => '天津市河北区'], true);
         echo User::getLastSql();echo "<br/>";
