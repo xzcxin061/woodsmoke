@@ -3,7 +3,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2022-06-30 11:58:45
  * @LastEditors: chuiyan xzcxin061@163.com
- * @LastEditTime: 2024-03-20 17:00:16
+ * @LastEditTime: 2024-03-26 11:58:17
  * @FilePath: /woodsmoke/app/model/User.php
  * @Description: 
  * 
@@ -87,5 +87,18 @@ class User extends Model
     {
         $value = "中国".$value;
         return $value;
+    }
+
+    /**
+     * 远程一对多关联
+     * 关联模型（必须）：关联模型类名
+     * 中间模型（必须）：中间模型类名
+     * 外键：默认的外键名规则是当前模型名+_id
+     * 中间表关联键：默认的中间表关联键名的规则是中间模型名+_id
+     * 当前模型主键：一般会自动获取也可以指定传入
+     * 中间模型主键：一般会自动获取也可以指定传入
+     */
+    public function comments() {
+        return $this->hasManyThrough(Comment::class, Article::class);
     }
 }

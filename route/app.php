@@ -239,3 +239,5 @@ Route::rule('bindpro', 'Index/get_bind_profit', 'get');
 Route::rule('rsave', 'Index/auto_relation_save', 'get');
 
 Route::rule('comments', 'Index/get_comments', 'get');
+
+Route::rule('thrda', 'Index/get_through_data', 'get');

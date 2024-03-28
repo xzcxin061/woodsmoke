@@ -15,6 +15,8 @@ use app\model\User;
 use app\model\UserProfile;
 use app\model\Blog;
 use app\model\Content;
+use app\model\Article;
+use app\model\Comment;
 use think\Container;
 use think\db\Query;
 use think\facade\Event;
@@ -403,12 +405,53 @@ class Index extends BaseController
      */
     public function get_comments()
     {
+        // 关联查询
         $user = User::find(4);
         // 获取该用户的所有文章
         dump($user->article);echo "<br/>";
-        $title_arr = $user->article()->limit(10)->select();
+        // 根据条件获取【关联数据】
+        $title_arr = $user->article()->where(['delete_time'=>0])->limit(10)->select();
         foreach($title_arr as $key=>$val){
             echo $val->title;echo "<br/>";
         }
+
+        // 根据关联条件查询【当前模型对象数据】
+        $list = Article::has('comments', '>=', 55)->select();
+        $data = Article::find(256);
+        dump($data->comments); // comments是关联方法名，不是模型名称
+        dump($list);
+        // 复杂关联条件查询
+        $where = Comment::where('parent_id',0)->where('content', 'like', '%给房车加水%');
+        $lists = Article::hasWhere('comments', $where)->select();
+        dump($lists);
+        // 关联新增
+        // $data->comments()->save(['user_id'=>3, 'article_id'=>256, 'parent_id'=>0, 'content'=>'此处现已收费，20元一天ccc', 'created_at'=>'2024-03-25 11:57:10']);
+        // $data->comments()->saveAll([['user_id'=>3, 'article_id'=>256, 'parent_id'=>0, 'content'=>'此处现已收费，10元一天aaa', 'created_at'=>'2024-03-25 11:57:10'], ['user_id'=>3, 'article_id'=>256, 'parent_id'=>0, 'content'=>'此处现已收费，30元一天bbb', 'created_at'=>'2024-03-25 11:57:10']]);
+        
+        // 相对关联，注意有的字段可能定义了获取器
+        $comment = Comment::find(133361);
+        $article = $comment->articles->thumb;
+        dump($article);
+
+        // 关联删除，还得弄数据不写了，写法和一对一关联一样，区别就是关联表可能删除多条数据
+
     }
+
+    /**
+     * 远程一对多
+     */
+    public function get_through_data()
+    {
+        $user = User::find(4);
+        // 查询关联模型，带上模型名前缀，防止冲突
+        // dump($user->comments);
+        dump($user->comments()->where('comment.article_id', 1967)->select());
+        // 查询当前模型
+        dump(User::hasWhere('comments', ['article_id'=>1967])->select());
+        // 查询当前模型，复杂查询
+        $where = Comment::where('article_id', 1967)->where('parent_id', '>', 0);
+        dump(User::hasWhere('comments', $where)->select());
+    }
+
+    
 }
